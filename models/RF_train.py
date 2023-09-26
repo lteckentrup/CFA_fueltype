@@ -106,7 +106,7 @@ def prep_data(GCM,reduce_dim):
 
     return(X_train, X_test, y_train, y_test, feature_names)
 
-def ML_function(GCM,reduce_dim,classifier):
+def ML_function(GCM,reduce_dim):
     ### Grab data
     X_train, X_test, y_train, y_test, feature_names = prep_data(GCM,
                                                                 reduce_dim)
@@ -157,10 +157,9 @@ def ML_function(GCM,reduce_dim,classifier):
     print(importances_df.sort_values(by=['importance'], ascending=False))
     importances_df.to_csv(GCM+'_importance_individual.csv')
 
-    if classifier == 'Random Forest':
-        ### Calculate maximum depth of tree
-        depths = [tree.tree_.max_depth for tree in clf.estimators_]
-        max_depth = max(depths)
+    ### Calculate maximum depth of tree
+    depths = [tree.tree_.max_depth for tree in clf.estimators_]
+    max_depth = max(depths)
 
     ### Calculate area under ROC curve for fueltype 1
     false_positive_rate, true_positive_rate, thresholds = roc_curve(y_test,
@@ -176,4 +175,4 @@ def ML_function(GCM,reduce_dim,classifier):
 
     return(y_test,y_pred)
 
-ML_function(args.GCM,False,'Random Forest')
+ML_function(args.GCM,False)
