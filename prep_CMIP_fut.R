@@ -25,7 +25,7 @@ time <- args$time
 years <- args$years
 
 ### Read in coordinates
-static.df <- fread('ft.static.csv')
+df.pred <- fread('pred.static.csv')
 
 ### Read in clim forcing
 tmax.ra <- readRDS(paste('../data/met/future/',GCM,'/',scen,'_',time,'/',scen,'_',years,'_annual_tmax.rds',sep=''))
@@ -42,15 +42,15 @@ met.stack = stack(list(tmax = tmax.ra,
                        lai = lai.ra))
 
 ### Convert to dataframe
-met.df <- as.data.frame(extract(met.stack,
-                        cbind(static.df$lon,static.df$lat)))
+df.met <- as.data.frame(extract(met.stack,
+                        cbind(df.pred$lon,df.pred$lat)))
 
 ### Combine met and static predictors
-static.df$tmax.mean <- met.df$tmax
-static.df$map <- met.df$prcp
-static.df$rh.mean <- met.df$rh
-static.df$lai.opt.mean <- met.df$lai
-static.df$pr.seaonality <- met.df$pr.seaonality
+df.pred$tmax.mean <- df.met$tmax
+df.pred$map <- df.met$prcp
+df.pred$rh.mean <- df.met$rh
+df.pred$lai.opt.mean <- df.met$lai
+df.pred$pr.seaonality <- df.met$pr.seaonality
 
 ### Write CSV file
-fwrite(static.df, paste('../cache/ft.',GCM,'.',scen,'_',time,'.csv',sep=''))
+fwrite(df.pred, paste('../cache/pred.',GCM,'.',scen,'_',time,'.csv',sep=''))
