@@ -1,18 +1,17 @@
 library(raster)
 library(data.table)
+library(argparse)
 
 ### Read in coordinates
 static.df <- fread('ft.static.csv')
 
-GCM='ACCESS1-0'
-# GCM='BNU-ESM'
-# GCM='CSIRO-Mk3-6-0'
-# GCM='GFDL-CM3'
-# GCM='GFDL-ESM2G'
-# GCM='GFDL-ESM2M'
-# GCM='INM-CM4'
-# GCM='IPSL-CM5A-LR'
-# GCM='MRI-CGCM3'
+parser <- ArgumentParser(description = 'Generate historical climate forcing for GCM of interest')
+parser$add_argument('--GCM', 
+                    dest='GCM', 
+                    help='Pass GCM name')
+
+args <- parser$parse_args()
+GCM <- args$GCM
 
 scen='history'
 years='20002015'
