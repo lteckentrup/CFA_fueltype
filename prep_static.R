@@ -99,4 +99,4 @@ df.pred$tenure <- extract(x = tenure.ra,
                           y = cbind(df.pred$lon,
                                     df.pred$lat))
 
-fwrite(df.pred, 'ft.static.csv')
+fwrite(df.pred, 'pred.static.csv')
