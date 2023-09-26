@@ -37,6 +37,8 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--GCM', type=str, required=True)
+parser.add_argument('--classifier', type=str, required=True)
+parser.add_argument('--reduce_dim', type=str, required=True)
 args = parser.parse_args()
 
 ### Set seed for reproducability
@@ -125,7 +127,7 @@ def prep_data(GCM,reduce_dim):
                     'awc']]
 
     ### Reduce dimensions using PCA
-    if reduce_dim == True:
+    if reduce_dim == 'PCA':
         ### Standardize predictors
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
@@ -172,7 +174,7 @@ def prep_data(GCM,reduce_dim):
             feature_names.append(feature_name)
     
     ### Use all predictors
-    elif reduce_dim == False:
+    elif reduce_dim == 'None':
         ### 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)   
         print(X_train)
@@ -306,6 +308,4 @@ def ML_function(GCM,reduce_dim,classifier):
 
     return(y_test,y_pred)
 
-# hypertuning('Random Forest', args.GCM, False)
-hypertuning('Nearest Neighbor', args.GCM, False)
-# hypertuning('Neural Network', args.GCM, False)
+hypertuning(args.classifier, args.GCM, args.reduce_dim)
