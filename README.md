@@ -17,6 +17,8 @@ for future projections.
 # Models
 The ```models``` directory contains three scripts: 
 
-```ML_approaches.py``` is the script we used to test three different machine learning frameworks (k-nearest neighbor, random forest, and multilayer perceptron), and find the best hyperparameter configuration for each model. The script takes two arguments, 
+```ML_approaches.py``` is the script we used to test three different machine learning frameworks (k-nearest neighbor, random forest, and multilayer perceptron), and find the best hyperparameter configuration for each model. The script takes three arguments: i) ```classifier``` ('Nearest Neighbor', 'Random Forest' or 'Neural Network'), ii) ```GCM```, and iii) ```reduce_dim``` which can be 'PCA' to reduce the dimensions using principal component analysis, or 'none' if the full set of predictors is kept.
 
-```RF_train.py``` is the random forest model which provided the best overall performance.
+```RF_train.py``` is the random forest model which provided the best overall performance and this script trains a random forest for each GCM. It takes one argument ('GCM').
+
+```RF_predict.py``` loads the trained random forest model and predicts the future fuel type distribution for the different GCMs, scenarios, and timespans. It takes three arguments, 'GCM', 'scen' (RCP scenario) and 'timespan' (*mid* for mid century, *long* for end century).
