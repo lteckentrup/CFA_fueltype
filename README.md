@@ -10,5 +10,5 @@ The ```prep_data``` directory contains all scripts used to prepare the predictio
 
 ```prep_CMIP_fut.R``` maps the future GCM projections to the coordinates of the fuel type map and combines the static and climate forcing (mid century: 2045-2060; end century: 2085-2100).
 
-```prep_CMIP_hist.R``` and ```prep_CMIP_fut.R``` take arguments to run. They can either be run individually from command line but there are also two bash scripts that loop through all GCMs, scenarios and timespans (```get_hist_predictors.sh``` and ```get_fut_predictors.sh```). The processing scripts generate CSV files with the naming convention ```pred.GCM.history.csv``` for the historical period, and ```pred.GCM.scen_timespan.csv```
+```prep_CMIP_hist.R``` and ```prep_CMIP_fut.R``` take arguments to run. They can either be run individually from command line but there are also two bash scripts that loop through all GCMs, scenarios and timespans (```get_hist_predictors.sh``` and ```get_fut_predictors.sh```). The processing scripts generate CSV files with the naming convention ```pred.'GCM'.history.csv``` for the historical period, and ```pred.'GCM'.'scen'_'timespan'.csv```
 for future projections.
