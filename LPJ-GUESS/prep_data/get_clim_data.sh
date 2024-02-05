@@ -7,9 +7,10 @@ scen='historical'
 # scen='rcp85'
 
 ### Select bias correction type
-# BC='r240x120-MRNBC-AWAP'
-BC='CSIRO-CCAM-r3355-r240x120-ISIMIP2b-AWAP' 
+### MRNBC-AWAP was recommended
+BC='r240x120-MRNBC-AWAP'
 
+#BC='r240x120-ISIMIP2b-AWAP'
 
 for GCM in CNRM-CERFACS-CNRM-CM5 CSIRO-BOM-ACCESS1-0 MIROC-MIROC5 NOAA-GFDL-GFDL-ESM2M; do
     ### Get temperature files
