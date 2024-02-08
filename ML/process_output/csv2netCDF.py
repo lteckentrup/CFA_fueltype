@@ -59,12 +59,12 @@ df_dropna = df.dropna()
 ### Read in either result aggregated across GCM ensemble ('mode')
 ### or result based on individual GCM
 if GCM == 'mode':
-    df_fut = pd.read_csv(pathwayIN+'output/csv/csv_files/'+scen+'_'+timespan+
+    df_fut = pd.read_csv(pathwayIN+'output/csv/csv_FT/'+scen+'_'+timespan+
                          '/mode_'+scen+'_'+timespan+'.csv')
     df_dropna['fuel_type']= df_fut['mode'].values.flatten()
 else:
-    df_fut = pd.read_csv(pathwayIN+'output/csv/csv_files/'+scen+'_'+timespan+
-                         '/fut_'+GCM+'_'+scen+'_'+timespan+'.csv')    
+    df_fut = pd.read_csv(pathwayIN+'output/csv/csv_FT/'+scen+'_'+timespan+
+                         '/fut_'+GCM+'_'+scen+'_'+timespan+'.csv')
     df_dropna['fuel_type']= df_fut[GCM].values.flatten()
 
 ### Select relevant columns and convert to xarray dataset
@@ -74,7 +74,7 @@ ds = df_final.to_xarray()
 
 ### Save to netCDF
 if GCM == 'mode':
-    ds.to_netcdf(pathwayIN+'/output/netCDF/mode_'+scen+'_'+timespan+'_TEST.nc',
+    ds.to_netcdf(pathwayIN+'/output/netCDF/mode_'+scen+'_'+timespan+'_90.nc',
                 encoding={'lat':{'dtype': 'double'},
                           'lon':{'dtype': 'double'},
                           'fuel_type':{'dtype': 'float32'}})
