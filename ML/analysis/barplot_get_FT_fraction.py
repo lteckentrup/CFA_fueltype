@@ -59,7 +59,7 @@ df_count['Obs'] = obs_count/len(df_obs) ### Fraction
 def read_in_df(GCM,scen,timespan):
     df = pd.DataFrame()
     df[GCM] = pd.read_csv(pathwayIN+'/output/csv/csv_FT/'+
-                          scen+'_long/fut_'+GCM+'_'+scen+'_'+timespan+'.csv')[GCM]
+                          scen+'_'+timespan+'/fut_'+GCM+'_'+scen+'_'+timespan+'.csv')[GCM]
     
     ### Drop nan
     df.dropna(inplace=True)
