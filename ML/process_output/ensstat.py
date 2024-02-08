@@ -16,11 +16,11 @@ scen = args.scen
 timespan = args.timespan
 
 ### Set pathway for input data
-pathwayIN='/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/dynamics_simulations/CFA/ML/output/csv/csv_files/'
+pathwayIN='/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/dynamics_simulations/CFA/ML/output/csv/csv_FT/'
 
 ### Function to read in csv 
 def get_data(GCM,scen,timespan):
-    df = pd.read_csv(pathwayIN+scen+'_'+timespan+'/fut_'+GCM+'_'+scen+'_'+timespan+'.csv', 
+    df = pd.read_csv(pathwayIN+scen+'_'+timespan+'/fut_'+GCM+'_'+scen+'_'+timespan+'.csv',
                      index_col=0)
     return(df[GCM].values)
 
