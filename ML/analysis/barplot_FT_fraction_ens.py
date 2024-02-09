@@ -4,6 +4,16 @@ import numpy as np
 import matplotlib.patches as patches
 import seaborn as sns
 
+### Fuel type plot attrs (fuel types, labels, colormap) grouped into fuel groups
+from fueltype_analysis_attributes import \
+    Wet_Shrubland, Wet_Shrubland_labels, CM_Wet_Shrubland, \
+    Wet_Forest, Wet_Forest_labels, CM_Wet_Forest, \
+    Grassland, Grassland_labels, CM_Grassland, \
+    Dry_forest, Dry_forest_labels, CM_Dry_forest, \
+    Shrubland, Shrubland_labels, CM_Shrubland, \
+    High_elevation, High_elevation_labels, CM_High_elevation, \
+    Mallee, Mallee_labels, CM_Mallee 
+
 '''
 Set up dataframe for fuel type fractions, and read in averages and 
 standard deviation for all scenarios and timeslices
@@ -28,74 +38,20 @@ labels_df = ['RCP4.5 (2045-2060)', 'RCP4.5 (2085-2100)',
 for f_IN, l_df in zip(files_IN, labels_df):
     df[l_df] = pd.read_csv(f_IN)['Avg']
     df[l_df+' Std'] = pd.read_csv(f_IN)['Std']
-
-'''
-Group individual fuel types into discussed broader group fuels - 
-this is consistently quite clunky I'm afraid
-'''
-
-### Wet shrubland
-Wet_Shrubland = [3001,3003,3014,3023,3029]
-Wet_Shrubland_tick_labels = ['Moist whrubland','Low flammable shrubs',
-                             'Riparian shrubland','Wet heath',
-                             'Ephemeral grass/\nsedge/ herbs']
-
-### Wet forest
-Wet_Forest = [3002,3006,3007,3011,3012,3013,3015]
-Wet_Forest_tick_labels = ['Moist woodland','Forest with shrub',
-                          'Forest herb-rich', 'Wet forest shrub &\nwiregrass',
-                          'Damp forest shrub', 'Riparian forest shrub', 
-                          'Rainforest']
-
-### Grassland
-Grassland = [3004,3020,3037,3046] 
-Grassland_tick_labels = ['Moist sedgeland/\ngrassland',
-                         'Temperate grassland/\nsedgeland',
-                         'Wet herbland','Eaten out grass'] 
-
-### Dry forest
-Dry_forest = [3005,3008,3009,3022,3028,3043]
-Dry_forest_tick_labels = ['Woodland heath',
-                          'Dry open forest\nshrubs/ herbs',
-                          'Woodland grass/\nherb-rich', 
-                          'Woodland bracken/\nshrubby',
-                          'Woodland Callitris/\nBelah',
-                          'Gum woodland\ngrass/ herbs']
-
-### Shrubland
-Shrubland = [3010,3021,3024]
-Shrubland_tick_labels = ['Sparse shrubland',
-                         'Broombush/ Shrubland/\nTea-tree',
-                         'Dry Heath']
-
-### High elevation
-High_elevation = [3016,3017,3018,3019]
-High_elevation_tick_labels = ['High elevation\ngrassland',
-                              'High elevation\nshrubland/ heath',
-                              'High elevation\nwoodland shrub',
-                              'High elevation\nwoodland grass']
-
-### Mallee
-Mallee = [3025,3026,3027,3048,3049,3050,3051] 
-Mallee_tick_labels = ['Mallee shrub/ heath','Mallee spinifex',
-                      'Mallee chenopod','Mallee dry heath',
-                      'Mallee shrub/\nheath (costata)',
-                      'Mallee spinifex\n(costata)',
-                      'Mallee shrub\nheath (discontinuous)'] 
-
+            
 ## Create custom order of fuel types to display individual
 ## fuel types ordered within their broad fuel groups
 custom_order = Wet_Forest+High_elevation+Wet_Shrubland+Mallee+\
                Dry_forest+Grassland+Shrubland
 
 ### List of xticklabels following custom_order
-xticklabels = np.concatenate([Wet_Forest_tick_labels,
-                              High_elevation_tick_labels,
-                              Wet_Shrubland_tick_labels,
-                              Mallee_tick_labels,
-                              Dry_forest_tick_labels,
-                              Grassland_tick_labels,
-                              Shrubland_tick_labels])
+xticklabels = np.concatenate([Wet_Forest_labels,
+                              High_elevation_labels,
+                              Wet_Shrubland_labels,
+                              Mallee_labels,
+                              Dry_forest_labels,
+                              Grassland_labels,
+                              Shrubland_labels])
 
 ### Include label column in dataframe
 df['Labels'] = pd.Categorical(df['Labels'], 
