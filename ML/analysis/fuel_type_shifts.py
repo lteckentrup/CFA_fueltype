@@ -99,7 +99,7 @@ def get_transition(fueltype):
     df_count.sort_values(by='labels',inplace=True)
 
     ### Round to two decimals, reset index
-    df_count['3001']=df_count['3001'].round(2)
+    df_count[fueltype]=df_count[fueltype].round(2)
     df_count.reset_index(drop=True,inplace=True)
 
     df_count.to_csv('csv/fuel_type_shift/'
