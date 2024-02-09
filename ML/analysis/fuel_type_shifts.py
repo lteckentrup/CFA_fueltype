@@ -10,7 +10,7 @@ import argparse
 Initialise argument parsing: 
 GCM for the different ensemble members: ACCESS1-0 BNU-ESM 
 CSIRO-Mk3-6-0 GFDL-CM3 GFDL-ESM2G GFDL-ESM2M INM-CM4 
-IPSL-CM5A-LR MRI-CGCM3 OR the target dataset 'Target'
+IPSL-CM5A-LR MRI-CGCM3 
 scen for RCP scenario (rcp45 or rcp85) 
 timespan (mid = 2045 - 2060, long = 2085 - 2100)
 '''
