@@ -20,7 +20,8 @@ timespan = args.timespan
 
 ### Read in observed pixel count of fuel types: 
 ### Same in each predictor csv file because it's the target file
-pathwayIN='/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/dynamics_simulations/CFA/ML/'
+pathwayIN=('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
+           'dynamics_simulations/CFA/ML/')
 df_obs = pd.read_csv(pathwayIN+'input/cache/ft.ACCESS1-0.history.csv')
 
 ### Drop Temperate Grassland / Sedgeland (3020) and
@@ -59,7 +60,8 @@ df_count['Obs'] = obs_count/len(df_obs) ### Fraction
 def read_in_df(GCM,scen,timespan):
     df = pd.DataFrame()
     df[GCM] = pd.read_csv(pathwayIN+'/output/csv/csv_FT/'+
-                          scen+'_'+timespan+'/fut_'+GCM+'_'+scen+'_'+timespan+'.csv')[GCM]
+                          scen+'_'+timespan+'/fut_'+GCM+'_'+scen+'_'+
+                          timespan+'.csv')[GCM]
     
     ### Drop nan
     df.dropna(inplace=True)
