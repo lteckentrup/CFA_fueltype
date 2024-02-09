@@ -143,7 +143,7 @@ ax.spines['top'].set_visible(False)
 
 ### For easier interpretation, include patches with colors according 
 ### to broad fuel group. First get colors (consistent across report),
-### then plot patch according to defined position
+### then plot colored patch according to defined position
 
 def plot_fuel_group_patch(x_start,x_end,colormap,n_fueltypes):
     pal = sns.color_palette(colormap,n_fueltypes)
@@ -161,6 +161,7 @@ def plot_fuel_group_patch(x_start,x_end,colormap,n_fueltypes):
                                   edgecolor=CM_FT[0], 
                                   facecolor=CM_FT[0],
                                   zorder=1)
+    
     plt.gca().add_patch(rectangle)
 
 plot_fuel_group_patch(-0.35,6.5,'Greens',7)
@@ -170,123 +171,6 @@ plot_fuel_group_patch(15.5,22.5,'Oranges',7)
 plot_fuel_group_patch(22.5,28.5,'Reds',6)
 plot_fuel_group_patch(28.5,32.5,'pink_r',4)
 plot_fuel_group_patch(32.5,35.5,'Purples',3)
-
-# ### Wet Forest
-# pal = sns.color_palette('Greens',7)
-# CM_Wet_Forest = pal.as_hex()
-
-# x_start = -0.35
-# x_end = 6.5
-
-# rectangle = patches.Rectangle((x_start, y_start), 
-#                               x_end - x_start, 
-#                               y_end - y_start, 
-#                               linewidth=1, 
-#                               edgecolor=CM_Wet_Forest[0], 
-#                               facecolor=CM_Wet_Forest[0],
-#                               zorder=1)
-# plt.gca().add_patch(rectangle)
-
-# ### High Elevation
-# pal = sns.color_palette('Greys',4)
-# CM_High_elevation = pal.as_hex()
-
-# x_start = 6.5
-# x_end = 10.5
-
-# rectangle = patches.Rectangle((x_start, y_start), 
-#                               x_end - x_start, 
-#                               y_end - y_start, 
-#                               linewidth=1, 
-#                               edgecolor=CM_High_elevation[0], 
-#                               facecolor=CM_High_elevation[0],
-#                               zorder=1)
-# plt.gca().add_patch(rectangle)
-
-# ### Wet shrubland
-# pal = sns.color_palette('Blues',5)
-# CM_Wet_Shrubland = pal.as_hex()
-
-# x_start = 10.5
-# x_end = 15.5
-# y_start = 0
-# y_end = 0.28
-
-# rectangle = patches.Rectangle((x_start, y_start), 
-#                               x_end - x_start, 
-#                               y_end - y_start, 
-#                               linewidth=1, 
-#                               edgecolor=CM_Wet_Shrubland[0], 
-#                               facecolor=CM_Wet_Shrubland[0],
-#                               zorder=1)
-# plt.gca().add_patch(rectangle)
-
-# ### Mallee
-# pal = sns.color_palette('Oranges',7)
-# CM_Mallee = pal.as_hex()
-
-# x_start = 15.5
-# x_end = 22.5
-
-# rectangle = patches.Rectangle((x_start, y_start), 
-#                               x_end - x_start, 
-#                               y_end - y_start, 
-#                               linewidth=1, 
-#                               edgecolor=CM_Mallee[0], 
-#                               facecolor=CM_Mallee[0],
-#                               zorder=1)
-# plt.gca().add_patch(rectangle)
-
-# ### Dry Forest
-# pal = sns.color_palette('Reds',6)
-# CM_Dry_forest = pal.as_hex()
-
-# x_start = 22.5
-# x_end = 28.5
-
-# rectangle = patches.Rectangle((x_start, y_start), 
-#                               x_end - x_start, 
-#                               y_end - y_start, 
-#                               linewidth=1, 
-#                               edgecolor=CM_Dry_forest[0], 
-#                               facecolor=CM_Dry_forest[0],
-#                               zorder=1)
-# plt.gca().add_patch(rectangle)
-
-# ### Grasslands
-# pal = sns.color_palette('pink_r',4)
-# CM_Grassland = pal.as_hex()
-
-# x_start = 28.5
-# x_end = 32.5
-# y_start = 0
-# y_end = 0.28
-
-# rectangle = patches.Rectangle((x_start, y_start), 
-#                               x_end - x_start, 
-#                               y_end - y_start, 
-#                               linewidth=1, 
-#                               edgecolor=CM_Grassland[0], 
-#                               facecolor=CM_Grassland[0],
-#                               zorder=1)
-# plt.gca().add_patch(rectangle)
-
-# ### Shrubland
-# pal = sns.color_palette('Purples',3)
-# CM_Shrubland = pal.as_hex()
-
-# x_start = 32.5
-# x_end = 35.5
-
-# rectangle = patches.Rectangle((x_start, y_start), 
-#                               x_end - x_start, 
-#                               y_end - y_start, 
-#                               linewidth=1, 
-#                               edgecolor=CM_Shrubland[0], 
-#                               facecolor=CM_Shrubland[0],
-#                               zorder=1)
-# plt.gca().add_patch(rectangle)
-
 
 ### Save figure
 plt.tight_layout()
