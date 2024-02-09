@@ -42,12 +42,12 @@ timespan = args.timespan
 ### Get predictor dataset for lat and lon coordinates
 if GCM == 'mode':
   df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
-                  'dynamics_simulations/CFA/ML/input/cache/'
-                  'ft.ACCESS1-0.'+scen+'_'+timespan+'.csv')
+                   'dynamics_simulations/CFA/ML/input/cache/'
+                   'ft.ACCESS1-0.'+scen+'_'+timespan+'.csv')
 else:
   df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
-                  'dynamics_simulations/CFA/ML/input/cache/'
-                  'ft.'+GCM+'.'+scen+'_'+timespan+'.csv')  
+                   'dynamics_simulations/CFA/ML/input/cache/'
+                   'ft.'+GCM+'.'+scen+'_'+timespan+'.csv')  
 
 ### Drop Temperate Grassland / Sedgeland (3020) and
 ### Eaten Out Grass when it's NOT on public land  
