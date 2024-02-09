@@ -22,7 +22,7 @@ import argparse
 Initialise argument parsing: 
 GCM for the different ensemble members: ACCESS1-0 BNU-ESM 
 CSIRO-Mk3-6-0 GFDL-CM3 GFDL-ESM2G GFDL-ESM2M INM-CM4 
-IPSL-CM5A-LR MRI-CGCM3
+IPSL-CM5A-LR MRI-CGCM3 OR the target dataset 'Target'
 scen for RCP scenario (rcp45 or rcp85) 
 timespan (mid = 2045 - 2060, long = 2085 - 2100)
 '''
@@ -40,7 +40,11 @@ scen = args.scen
 timespan = args.timespan
 
 ### Get predictor dataset for lat and lon coordinates
-if GCM == 'mode':
+if GCM == 'Target':
+  df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
+                   'dynamics_simulations/CFA/ML/input/cache/'
+                   'ft.ACCESS1-0.history.csv')
+elif GCM == 'mode':
   df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
                    'dynamics_simulations/CFA/ML/input/cache/'
                    'ft.ACCESS1-0.'+scen+'_'+timespan+'.csv')
@@ -58,16 +62,21 @@ df = df.loc[~((df['FT'] == 3046) & (df['tenure'] == 0)),:]
 df.replace([np.inf, -np.inf], np.nan, inplace=True)
 df_dropna = df.dropna()
 
-### Read in projected fuel type distribution
-df_fut = pd.read_csv('../output/csv/csv_FT/'+scen+'_'+timespan+
-                     '/'+GCM+'_'+scen+'_'+timespan+'.csv')
+if GCM != 'Target':
+  ### Read in projected fuel type distribution
+  df_fut = pd.read_csv('../output/csv/csv_FT/'+scen+'_'+timespan+
+                      '/'+GCM+'_'+scen+'_'+timespan+'.csv')
 
-### Combine dataframes
-df_dropna['mode']= df_fut[GCM].values.flatten()
+  ### Combine dataframes
+  df_dropna['FT']= df_fut[GCM].values.flatten()
 
-### Select relevant columns
-df_sel = df_dropna[['lat','lon','mode']]
-df_final = df_sel.set_index(['lat','lon'])
+  ### Select relevant columns
+  df_sel = df_dropna[['lat','lon','FT']]
+  df_final = df_sel.set_index(['lat','lon'])
+
+elif GCM == 'Target':
+  df_sel = df_dropna[['lat','lon','FT']]
+  df_final = df_sel.set_index(['lat','lon'])
 
 ### Convert to xarray dataset
 ds = df_final.to_xarray()
@@ -116,13 +125,13 @@ def plot(dataset, ft_list, ft_colors):
 
 ### Call function for each fuel group: Pretty clunky but couldn't figure out 
 ### another way to link fuel type labels and specific colors
-plot(ds['mode'].values,Wet_Shrubland,CM_Wet_Shrubland)
-plot(ds['mode'].values,Wet_Forest,CM_Wet_Forest)
-plot(ds['mode'].values,Grassland,CM_Grassland)
-plot(ds['mode'].values,Dry_forest,CM_Dry_forest)
-plot(ds['mode'].values,Shrubland,CM_Shrubland)
-plot(ds['mode'].values,High_elevation,CM_High_elevation)
-plot(ds['mode'].values,Mallee,CM_Mallee)
+plot(ds['FT'].values,Wet_Shrubland,CM_Wet_Shrubland)
+plot(ds['FT'].values,Wet_Forest,CM_Wet_Forest)
+plot(ds['FT'].values,Grassland,CM_Grassland)
+plot(ds['FT'].values,Dry_forest,CM_Dry_forest)
+plot(ds['FT'].values,Shrubland,CM_Shrubland)
+plot(ds['FT'].values,High_elevation,CM_High_elevation)
+plot(ds['FT'].values,Mallee,CM_Mallee)
 
 '''
 Set the extent/ padding: 
@@ -182,4 +191,8 @@ ax.yaxis.set_visible(True)
 
 ### Save figure
 plt.tight_layout()
-plt.savefig('figures/mode_'+scen+'_'+timespan+'.jpg',dpi=1000)
+
+if GCM == 'Target':
+  plt.savefig('figures/map_fuel_types_'+GCM+'.jpg',dpi=1000)
+else:
+  plt.savefig('figures/map_fuel_types_'+GCM+'_'+scen+'_'+timespan+'.jpg',dpi=1000)
