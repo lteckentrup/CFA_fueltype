@@ -130,7 +130,7 @@ subtract 0.05 from the first latitude
 add 0.05 to the last longitude
 '''
 
-ax.set_extent([lons[0], lons[-1] + 0.05,
+ax.set_extent([lons[0] - 0.05, lons[-1] + 0.05,
                lats[0] - 0.05, lats[-1] + 0.05],
                crs=ccrs.PlateCarree())
 
@@ -143,9 +143,9 @@ ax.add_feature(cfeature.NaturalEarthFeature(
 ax.coastlines()
 
 ### Adding state borders looks a bit ugly in NW where vertical state borders 
-### of NSW and Vic are offset, also in SE unnecessary border plus ACT is this 
-### random blob so I added patches to mask those areas (probably easier getting
-### a mask from a shape file but I didn't have one at the time)
+### of NSW and Vic are offset, also in SE unnecessary border. Then ACT is this 
+### random blob - so added patches to cover those areas (probably easier getting
+### Victoria shape from a shape file but I didn't have one at the time)
 
 ### NSW border SE
 ax.add_patch(mpatches.Rectangle(xy=[149.5, -37.313], width=0.6, height=0.85,
@@ -175,9 +175,6 @@ ax.spines['geo'].set_visible(False)
 ### Reintroduce left and bottom spine
 ax.spines['left'].set_visible(True)
 ax.spines['bottom'].set_visible(True)
-
-### Pad between left and state Vic state border
-ax.spines['left'].set_position(('outward', 0.1))
 
 ### Show ticklabels left and bottom
 ax.xaxis.set_visible(True)
