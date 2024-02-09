@@ -125,7 +125,7 @@ plot(ds['mode'].values,High_elevation,CM_High_elevation)
 plot(ds['mode'].values,Mallee,CM_Mallee)
 
 '''
-Set the extent: 
+Set the extent/ padding: 
 subtract 0.05 from the first latitude and longitude
 add 0.05 to the last latitude and longitude 
 '''
