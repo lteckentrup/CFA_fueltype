@@ -12,19 +12,17 @@ standard deviation for all scenarios and timeslices
 df = pd.DataFrame()
 df['Labels'] = pd.read_csv('csv/count_rcp45_mid.csv')['FT'] # Get fuel type labels
 df['Observation'] = pd.read_csv('csv/count_rcp45_mid.csv')['Obs'] # Get observed fuel type fraction
+df['Observation Std'] = 0 # dummy 
 
 ### Projected fuel type fraction averaged across GCM ensemble
-df['RCP4.5 (2045-2060)'] = pd.read_csv('csv/count_rcp45_mid.csv')['Avg']
-df['RCP4.5 (2085-2100)'] = pd.read_csv('csv/count_rcp45_long.csv')['Avg']
-df['RCP8.5 (2045-2060)'] = pd.read_csv('csv/count_rcp85_mid.csv')['Avg']
-df['RCP8.5 (2085-2100)'] = pd.read_csv('csv/count_rcp85_long.csv')['Avg']
+files_IN = ['csv/count_rcp45_mid.csv','csv/count_rcp45_long.csv',
+            'csv/count_rcp85_mid.csv','csv/count_rcp85_long.csv']
+labels_df = ['RCP4.5 (2045-2060)', 'RCP4.5 (2085-2100)',
+             'RCP8.5 (2045-2060)', 'RCP8.5 (2085-2100)']
 
-df['Observation Std'] = 0 # dummy 
-### Standard deviation of projected fuel type fraction across GCM ensemble
-df['RCP4.5 (2045-2060) Std'] = pd.read_csv('csv/count_rcp45_mid.csv')['Std']
-df['RCP4.5 (2085-2100) Std'] = pd.read_csv('csv/count_rcp45_long.csv')['Std']
-df['RCP8.5 (2045-2060) Std'] = pd.read_csv('csv/count_rcp85_mid.csv')['Std']
-df['RCP8.5 (2085-2100) Std'] = pd.read_csv('csv/count_rcp85_long.csv')['Std']
+for f_IN, l_df in zip(files_IN, labels_df):
+    df[l_df] = pd.read_csv(f_IN)['Avg']
+    df[l_df+' Std'] = pd.read_csv(f_IN)['Std']
 
 '''
 Group individual fuel types into discussed broader group fuels - 
@@ -80,8 +78,8 @@ Mallee_tick_labels = ['Mallee shrub/ heath','Mallee spinifex',
                       'Mallee spinifex\n(costata)',
                       'Mallee shrub\nheath (discontinuous)'] 
 
-### Create custom order of fuel types to display individual
-### fuel types ordered within their broad fuel groups
+## Create custom order of fuel types to display individual
+## fuel types ordered within their broad fuel groups
 custom_order = Wet_Forest+High_elevation+Wet_Shrubland+Mallee+\
                Dry_forest+Grassland+Shrubland
 
