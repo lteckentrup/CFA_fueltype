@@ -10,9 +10,14 @@ standard deviation for all scenarios and timeslices
 '''
 
 df = pd.DataFrame()
-df['Labels'] = pd.read_csv('csv/count_rcp45_mid.csv')['FT'] # Get fuel type labels
-df['Observation'] = pd.read_csv('csv/count_rcp45_mid.csv')['Obs'] # Get observed fuel type fraction
-df['Observation Std'] = 0 # dummy 
+### Get fuel type labels
+df['Labels'] = pd.read_csv('csv/count_rcp45_mid.csv')['FT'] 
+
+### Get observed fuel type fraction
+df['Observation'] = pd.read_csv('csv/count_rcp45_mid.csv')['Obs'] 
+
+### dummy - need same number columns for STD for errorbar plot command later
+df['Observation Std'] = 0 
 
 ### Projected fuel type fraction averaged across GCM ensemble
 files_IN = ['csv/count_rcp45_mid.csv','csv/count_rcp45_long.csv',
@@ -112,10 +117,12 @@ df.set_index('Labels')[['Observation',
                                      'RCP4.5 (2085-2100) Std', 
                                      'RCP8.5 (2045-2060) Std', 
                                      'RCP8.5 (2085-2100) Std']].values.T, 
-                        color=['tab:grey', '#5eccab', '#00678a', '#e6a176', '#984464'], ### bar colors
+                        color=['tab:grey', '#5eccab', '#00678a', 
+                               '#e6a176', '#984464'], ### bar colors
                         width=0.7,
                         ax=ax,
-                        error_kw=dict(ecolor='black',linewidth=0.5, lolims=False, capsize=0), ### errorbar
+                        error_kw=dict(ecolor='black',linewidth=0.5, 
+                                      lolims=False, capsize=0), ### errorbar
                         zorder=2
                         )
 
