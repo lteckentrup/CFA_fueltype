@@ -126,8 +126,8 @@ plot(ds['mode'].values,Mallee,CM_Mallee)
 
 '''
 Set the extent: 
-subtract 0.05 from the first latitude
-add 0.05 to the last longitude
+subtract 0.05 from the first latitude and longitude
+add 0.05 to the last latitude and longitude 
 '''
 
 ax.set_extent([lons[0] - 0.05, lons[-1] + 0.05,
