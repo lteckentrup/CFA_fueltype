@@ -1,20 +1,8 @@
 import pandas as pd
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from matplotlib.colors import BoundaryNorm
-from matplotlib.colors import ListedColormap
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-import matplotlib.patches as mpatches
 from fueltype_analysis_attributes import \
-    Wet_Shrubland, Wet_Shrubland_labels, CM_Wet_Shrubland, \
-    Wet_Forest, Wet_Forest_labels, CM_Wet_Forest, \
-    Grassland, Grassland_labels, CM_Grassland, \
-    Dry_forest, Dry_forest_labels, CM_Dry_forest, \
-    Shrubland, Shrubland_labels, CM_Shrubland, \
-    High_elevation, High_elevation_labels, CM_High_elevation, \
-    Mallee, Mallee_labels, CM_Mallee 
+    Wet_Shrubland, Wet_Forest, Grassland, Dry_forest, Shrubland, \
+    High_elevation, Mallee
 
 import argparse
 
@@ -39,160 +27,89 @@ GCM = args.GCM
 scen = args.scen
 timespan = args.timespan
 
-### Get predictor dataset for lat and lon coordinates
-if GCM == 'Target':
-  df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
-                   'dynamics_simulations/CFA/ML/input/cache/'
-                   'ft.ACCESS1-0.history.csv')
-elif GCM == 'mode':
-  df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
-                   'dynamics_simulations/CFA/ML/input/cache/'
-                   'ft.ACCESS1-0.'+scen+'_'+timespan+'.csv')
-else:
-  df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
-                   'dynamics_simulations/CFA/ML/input/cache/'
-                   'ft.'+GCM+'.'+scen+'_'+timespan+'.csv')  
+fueltypes = Wet_Forest+High_elevation+Wet_Shrubland+Mallee+\
+            Dry_forest+Grassland+Shrubland
+
+### Read in present day fuel type distribution - stored in all predictor files for
+### historical period ('history') - the same for all GCMs
+
+### Set pathway
+pathway=('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
+         'dynamics_simulations/CFA/ML/')
+
+df_hist = pd.read_csv(pathway+'input/cache/pred.ACCESS1-0.history.csv')
 
 ### Drop Temperate Grassland / Sedgeland (3020) and
-### Eaten Out Grass when it's NOT on public land  
-df = df.loc[~((df['FT'] == 3020) & (df['tenure'] == 0)),:]
-df = df.loc[~((df['FT'] == 3046) & (df['tenure'] == 0)),:]
+### Eaten Out Grass when it's NOT on public land
+df_hist = df_hist.loc[~((df_hist['FT'] == 3020) & (df_hist['tenure'] == 0)),:]
+df_hist = df_hist.loc[~((df_hist['FT'] == 3046) & (df_hist['tenure'] == 0)),:]
+
+### Drop Water, sand, no vegetation (3000)
+df_hist.replace(3000, np.nan, inplace=True)
+
+### Drop Non-Combustible (3047)
+df_hist.replace(3047, np.nan, inplace=True)
+
+### Drop Orchard / Vineyard (3097),
+### Softwood Plantation (3098),
+### Hardwood Plantation (3099)
+df_hist.replace(3097, np.nan, inplace=True)
+df_hist.replace(3098, np.nan, inplace=True)
+df_hist.replace(3099, np.nan, inplace=True)
 
 ### Set inf to Nan
-df.replace([np.inf, -np.inf], np.nan, inplace=True)
-df_dropna = df.dropna()
+df_hist.replace([np.inf, -np.inf], np.nan, inplace=True)
+df_hist.dropna(inplace=True)
 
-if GCM != 'Target':
-  ### Read in projected fuel type distribution
-  df_fut = pd.read_csv('../output/csv/csv_FT/'+scen+'_'+timespan+
-                      '/'+GCM+'_'+scen+'_'+timespan+'.csv')
+### Read in projected fuel type distribution (aggregated across ensemble)
+df_fut = pd.read_csv(pathway+'output/csv/csv_FT/'+scen+'_'+timespan+
+                     '/'+GCM+'_'+scen+'_'+timespan+'.csv')
 
-  ### Combine dataframes
-  df_dropna['FT']= df_fut[GCM].values.flatten()
+### Combine dataframes for comparison
+df_fut['hist'] = df_hist.reset_index()['FT']
 
-  ### Select relevant columns
-  df_sel = df_dropna[['lat','lon','FT']]
-  df_final = df_sel.set_index(['lat','lon'])
+### Calculate where present day fuel types remains or shifts to new type
+def get_transition(fueltype):
 
-elif GCM == 'Target':
-  df_sel = df_dropna[['lat','lon','FT']]
-  df_final = df_sel.set_index(['lat','lon'])
+    ### Select fuel type
+    df_FT = df_fut[df_fut['hist'] == fueltype]
 
-### Convert to xarray dataset
-ds = df_final.to_xarray()
+    ### Count which fuel types and how many occur in grid cells currently 
+    ### occupied by selected fuel type
+    labels,counts = np.unique(df_FT['mode'],return_counts=True)
 
-### This is a bit clunky but I set up a colormap for each fuel group to manage
-### to assign each fuel type a specific color consistent across the report
-def colormap_fueltype(ft_list, ft_colors):
-  cmap = mpl.colors.ListedColormap(ft_colors)
-  ft_list.append(4000)
-  bounds = ft_list
-  norm = BoundaryNorm(bounds, cmap.N)
-  return(cmap,bounds,norm)
+    ### Set up dataframe with labels and respective count/ calculate percentage
+    df_count = pd.DataFrame()
+    df_count['labels'] = labels
+    df_count[str(fueltype)] = (counts/len(df_FT))*100
 
-### Make mask
-def mask_vic(dataset,ft_list):
-  da_copy = dataset
-  mask = np.isin(da_copy, ft_list)
-  mx = np.ma.masked_array(da_copy, ~mask)
-  return(mx)
+    ### Full list of fuel types based on present day
+    labels_hist = df_hist.FT.drop_duplicates()
 
-lats = ds.lat.values.tolist()
-lons = ds.lon.values.tolist()
+    ### Get list of projected fuel types - likely mismatch with full list
+    labels_count = df_count.labels.drop_duplicates()
 
-### Set up plot
-fig, ax = plt.subplots(figsize=(11, 6),
-                       subplot_kw={'projection': ccrs.PlateCarree()})
+    ### Get missing fuel types compared to full list
+    miss_labels = list(set(labels_hist).difference(labels_count))
 
-def plot(dataset, ft_list, ft_colors):
-  global lats
-  global lons
+    ### Fill missing fuel types and assign 0 -> easier to process dataframes
+    ### when each dataframe has exactly same rows
+    try:
+        for i in range(0,len(miss_labels)):
+            df_count.loc[len(df_count)] = [miss_labels[i],0]
+    except IndexError:
+        pass
 
-  ### Get attributes for colormap
-  cmap,bounds,norm = colormap_fueltype(ft_list, ft_colors)
+    ### Sort dataframe by labels 
+    df_count.sort_values(by='labels',inplace=True)
 
-  ### Get data
-  data = mask_vic(dataset,ft_list)
+    ### Round to two decimals, reset index
+    df_count[fueltype]=df_count[fueltype].round(2)
+    df_count.reset_index(drop=True,inplace=True)
 
-  ### Make map
-  im = ax.pcolormesh(lons,
-                     lats,
-                     data,
-                     cmap=cmap,
-                     norm=norm,
-                     rasterized=True,
-                     transform=ccrs.PlateCarree())
+    df_count.to_csv('csv/fuel_type_shift/'
+                    'transition_'+GCM+'_'+str(fueltype)+'_'+scen+'_'+timespan+'.csv',
+                    index=False)
 
-### Call function for each fuel group: Pretty clunky but couldn't figure out 
-### another way to link fuel type labels and specific colors
-plot(ds['FT'].values,Wet_Shrubland,CM_Wet_Shrubland)
-plot(ds['FT'].values,Wet_Forest,CM_Wet_Forest)
-plot(ds['FT'].values,Grassland,CM_Grassland)
-plot(ds['FT'].values,Dry_forest,CM_Dry_forest)
-plot(ds['FT'].values,Shrubland,CM_Shrubland)
-plot(ds['FT'].values,High_elevation,CM_High_elevation)
-plot(ds['FT'].values,Mallee,CM_Mallee)
-
-'''
-Set the extent/ padding: 
-subtract 0.05 from the first latitude and longitude
-add 0.05 to the last latitude and longitude 
-'''
-
-ax.set_extent([lons[0] - 0.05, lons[-1] + 0.05,
-               lats[0] - 0.05, lats[-1] + 0.05],
-               crs=ccrs.PlateCarree())
-
-### Add state borders
-ax.add_feature(cfeature.NaturalEarthFeature(
-    'cultural', 'admin_1_states_provinces_lines', '10m',
-    edgecolor='k', facecolor='none',
-    linewidth=1.0, linestyle='solid'))
-
-ax.coastlines()
-
-### Adding state borders looks a bit ugly in NW where vertical state borders 
-### of NSW and Vic are offset, also in SE unnecessary border. Then ACT is this 
-### random blob - so added patches to cover those areas (probably easier getting
-### Victoria shape from a shape file but I didn't have one at the time)
-
-### NSW border SE
-ax.add_patch(mpatches.Rectangle(xy=[149.5, -37.313], width=0.6, height=0.85,
-                                facecolor='w',
-                                zorder=12,
-                                angle=338,
-                                transform=ccrs.PlateCarree())
-                        )
-
-### NSW border NW
-ax.add_patch(mpatches.Rectangle(xy=[140.992, -34.005], width=0.02, height=0.08,
-                                facecolor='w',
-                                zorder=12,
-                                transform=ccrs.PlateCarree())
-                        )
-
-### ACT
-ax.add_patch(mpatches.Rectangle(xy=[148.7, -35.95], width=0.8, height=0.85,
-                                facecolor='w',
-                                zorder=12,
-                                transform=ccrs.PlateCarree())
-                        )
-
-### Drop spines
-ax.spines['geo'].set_visible(False)
-
-### Reintroduce left and bottom spine
-ax.spines['left'].set_visible(True)
-ax.spines['bottom'].set_visible(True)
-
-### Show ticklabels left and bottom
-ax.xaxis.set_visible(True)
-ax.yaxis.set_visible(True)
-
-### Save figure
-plt.tight_layout()
-
-if GCM == 'Target':
-  plt.savefig('figures/map_fuel_types_'+GCM+'.jpg',dpi=1000)
-else:
-  plt.savefig('figures/map_fuel_types_'+GCM+'_'+scen+'_'+timespan+'.jpg',dpi=1000)
+for i in fueltypes:
+    get_transition(i)
