@@ -12,12 +12,11 @@ df = pd.read_csv('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
 ### topography rad, soil properties, topography curvature, uranium + thorium)
 order = ['tmax.mean', 'map', 'rh.mean', 'pr.seaonality', 'lai.opt.mean',
          'rad.short.jan', 'rad.short.jul', 'soil.depth', 'soil.density', 
-         'clay', 'awc', 'wi', 'curvature_plan', 
-         'curvature_profile', 'uran_pot', 'thorium_pot'] 
+         'clay', 'awc', 'wi', 'curvature_plan', 'curvature_profile', 
+         'uran_pot', 'thorium_pot'] 
 
 ### Clean dataframe and drop irrelevant columns
-df.drop(columns=['x','y','lon','lat','ft','uranium','thorium',
-                 'potassium','elevation'],
+df.drop(columns=['lon','lat','FT','uranium','thorium','potassium','elevation'],
                  inplace=True)
 
 ### Order dataframe following custom order
