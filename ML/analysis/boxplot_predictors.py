@@ -123,5 +123,5 @@ ax1.spines['top'].set_visible(False)
 
 ### Save figure
 plt.tight_layout()
-plt.savefig('boxplot_'+args.var+'.pdf')
+plt.savefig('figures/boxplot_'+args.var+'.pdf')
 
