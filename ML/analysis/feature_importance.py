@@ -4,12 +4,14 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator
 
 ### Set absolute pathway
-pathwayIN='/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/dynamics_simulations/CFA/ML/'
+pathwayIN=('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
+           'dynamics_simulations/CFA/ML/')
 
 ### Read in importance score
 def get_imp(GCM):
     global pathwayIN
-    df = pd.read_csv(pathwayIN+'/output/csv/csv_scores/feature_importance/'+GCM+'_ft_importance.csv')
+    df = pd.read_csv(pathwayIN+'/output/csv/csv_scores/feature_importance/'+
+                     GCM+'_ft_importance.csv')
     return(df.importance)
 
 ### Set up dataframe for importance for individual GCMs
@@ -28,8 +30,9 @@ df['MRI-CGCM3'] = get_imp('MRI-CGCM3')
 df_imp = pd.DataFrame()
 
 ### Grab feature labels
-df_imp['Feature'] = pd.read_csv(pathwayIN+'/output/csv/csv_scores/'
-                                'feature_importance/ACCESS1-0_ft_importance.csv')['feature']
+df_imp['Feature'] = pd.read_csv(
+    pathwayIN+'/output/csv/csv_scores/'
+    'feature_importance/ACCESS1-0_ft_importance.csv')['feature']
 
 ### Average importance across ensemble
 df_imp['Importance'] = df.mean(axis=1)
@@ -51,10 +54,11 @@ ax.barh(df_imp['Feature'],
 ### Update figure labels
 ax.yaxis.set_major_locator(FixedLocator(range(len(df_imp))))
 ax.set_yticklabels(['Plan curvature', 'Profile curvature','Rad$_{Jul}$',
-                    'TWI', 'Thorium\nPotassium ratio', 'Uranium\nPotassium ratio', 
-                    'AWC', 'Soil depth', 'Precipitation\nseasonality', 'Clay', 'BDW',
-                    'MAP', 'LAI$_{opt}$', 'RH$_{min}$', 'T$_{max}$','Rad$_{Jan}$'
-                    ])
+                    'TWI', 'Thorium\nPotassium ratio', 
+                    'Uranium\nPotassium ratio', 'AWC', 'Soil depth', 
+                    'Precipitation\nseasonality', 'Clay', 'BDW',
+                    'MAP', 'LAI$_{opt}$', 'RH$_{min}$', 'T$_{max}$',
+                    'Rad$_{Jan}$'])
 ax.set_xlabel('Feature importance')
 
 ### Drop right and top spine
