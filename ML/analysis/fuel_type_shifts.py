@@ -8,17 +8,22 @@ import argparse
 
 '''
 Initialise argument parsing: 
+GCM for the different ensemble members: ACCESS1-0 BNU-ESM 
+CSIRO-Mk3-6-0 GFDL-CM3 GFDL-ESM2G GFDL-ESM2M INM-CM4 
+IPSL-CM5A-LR MRI-CGCM3 OR the target dataset 'Target'
 scen for RCP scenario (rcp45 or rcp85) 
 timespan (mid = 2045 - 2060, long = 2085 - 2100)
 '''
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--GCM', type=str, required=True)
 parser.add_argument('--scen', type=str, required=True)
 parser.add_argument('--timespan', type=str, required=True)
 
 args = parser.parse_args()
 
 ### Assign variables
+GCM = args.GCM
 scen = args.scen
 timespan = args.timespan
 
@@ -58,7 +63,7 @@ df_hist.dropna(inplace=True)
 
 ### Read in projected fuel type distribution (aggregated across ensemble)
 df_fut = pd.read_csv(pathway+'output/csv/csv_FT/'+scen+'_'+timespan+
-                     '/mode_'+scen+'_'+timespan+'.csv')
+                     '/'+GCM+'_'+scen+'_'+timespan+'.csv')
 
 ### Combine dataframes for comparison
 df_fut['hist'] = df_hist.reset_index()['FT']
@@ -99,11 +104,11 @@ def get_transition(fueltype):
     df_count.sort_values(by='labels',inplace=True)
 
     ### Round to two decimals, reset index
-    df_count[fueltype]=df_count[fueltype].round(2)
+    df_count[str(fueltype)]=df_count[str(fueltype)].round(2)
     df_count.reset_index(drop=True,inplace=True)
 
     df_count.to_csv('csv/fuel_type_shift/'
-                    'transition_'+str(fueltype)+'_'+scen+'_'+timespan+'.csv',
+                    'transition_'+GCM+'_'+str(fueltype)+'_'+scen+'_'+timespan+'.csv',
                     index=False)
 
 for i in fueltypes:
