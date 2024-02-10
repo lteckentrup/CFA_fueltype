@@ -60,10 +60,10 @@ df_fut = pd.read_csv(pathway+'output/csv/csv_FT/'+scen+'_'+timespan+'/mode_'+
                      scen+'_'+timespan+'.csv')
 
 ### Combine dataframes 
-df['mode']= df_fut['mode_counts'].values.flatten()
+df_dropna['mode_counts']= df_fut['mode_counts'].values.flatten()
 
 ### Select relevant columns and prepare to convert to xarray dataset
-df_final = df[['lat','lon','mode']].set_index(['lat','lon'])
+df_final = df_dropna[['lat','lon','mode_counts']].set_index(['lat','lon'])
 
 ### Convert to xarray dataset
 ds = df_final.to_xarray()
@@ -88,7 +88,7 @@ cmap = mpl.colors.ListedColormap(colors[:], '')
 ### Plot map
 im = ax.pcolormesh(lons,
                    lats,
-                   ds['mode'].values,
+                   ds['mode_counts'].values,
                    cmap=cmap,
                    vmin=1,vmax=9,
                    rasterized=True,
