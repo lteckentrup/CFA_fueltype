@@ -88,9 +88,12 @@ def make_plot(var,scen,timespan,ensstat,label,ax,title,cmap):
     da_mask = da.where(~mask)
 
     if ensstat != 'CV':
-        norm = None if var == 'annual_tmax' else CenteredNorm()
+        if var == 'annual_tmax':
+            norm = None 
+        else:
+            norm = CenteredNorm()
     else:
-        norm = CenteredNorm()
+        norm = None
 
     c = ax.contourf(da_mask.longitude,
                     da_mask.latitude,
