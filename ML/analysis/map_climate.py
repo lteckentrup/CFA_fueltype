@@ -150,7 +150,21 @@ def make_plot(var,scen,timespan,ensstat,label,ax,title,cmap):
     
     ax.set_extent([140.9,150.0,-39.2,-33.9], crs=ccrs.PlateCarree())
     ax.add_feature(cfeature.COASTLINE)
-    ax.axis('off')
+
+    ### ! in the original report I didn't have any axes, using 
+    ### ax.axis('off') 
+    ### But I included them now just in case? Case of personal pref I guess
+         
+    ### Drop spines
+    ax.spines['geo'].set_visible(False)
+
+    ### Reintroduce left and bottom spine
+    ax.spines['left'].set_visible(True)
+    ax.spines['bottom'].set_visible(True)
+
+    ### Show ticklabels left and bottom
+    ax.xaxis.set_visible(True)
+    ax.yaxis.set_visible(True)
 
 ### Create the figure and grid specification
 def set_up_figure(scen,timespan,ensstat,cmap_list):
