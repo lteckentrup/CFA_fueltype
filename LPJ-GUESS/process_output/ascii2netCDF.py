@@ -29,11 +29,15 @@ from vars_global import (
 ### Which date
 date_created = date.today()
 
+### Set pathway where out files are located
+pathwayIN='/g/data/w97/lt0205/research/lpj_guess_4.1/runs/runs_HIE/'
+
 ### Convert annual *out files to netcdf
 def convert_ascii_netcdf_annual(var,config,res):
+    global pathwayIN
     ### Read in out file
-    df = pd.read_csv('/g/data/w97/lt0205/research/lpj_guess_4.1/runs/runs_HIE/'+
-                     config+'/'+var+'.out',header=0,delim_whitespace=True)
+    df = pd.read_csv(pathwayIN+config+'/'+var+'.out',
+                     header=0,delim_whitespace=True)
     
     ### Get years, first and last year is used for file name
     years = np.unique(df.Year)
@@ -235,9 +239,11 @@ def convert_ascii_netcdf_annual(var,config,res):
     ds.to_netcdf(fileOUT, encoding=encoding_dict)
 
 def convert_ascii_netcdf_monthly(var,config,res):
+    global pathwayIN
+    
     ### Read in out file
-    df = pd.read_csv('/g/data/w97/lt0205/research/lpj_guess_4.1/runs/runs_HIE/'+
-                     config+'/'+var+'.out',header=0,delim_whitespace=True)
+    df = pd.read_csv(pathwayIN+config+'/'+var+'.out',
+                     header=0,delim_whitespace=True)
 
     ### Rename columns to more traditional dimension names
     df.rename(columns={'Year': 'year', 
