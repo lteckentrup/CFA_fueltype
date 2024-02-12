@@ -63,6 +63,6 @@ df_vic = gdf_vic[['longitude', 'latitude']]
 
 ### Write file: use resolution as identifier
 res_fname = args.res
-df_vic.to_csv(res.replace('.','')+'_grid.txt', 
+df_vic.to_csv(res_fname.replace('.','')+'_grid.txt', 
               sep=' ', 
               index=False)
