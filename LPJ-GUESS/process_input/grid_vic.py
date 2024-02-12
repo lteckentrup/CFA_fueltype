@@ -47,7 +47,8 @@ data = {
 df = pd.DataFrame(data)
 
 ### Select points that are in Vic: Read in shape file with state boundaries; index 1 = Vic
-gdf = gpd.read_file('/g/data/w97/lt0205/HIE/FIRMS/FIRMS/STE_2021_AUST_GDA2020.shp')
+gdf = gpd.read_file('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/dynamics_simulations/'
+                    'CFA/ML/analysis/shape_files/STE_2021_AUST_GDA2020.shp')
 state = gdf.iloc[[1]]
 
 ### Create geopandas df and join df and state boundaries
