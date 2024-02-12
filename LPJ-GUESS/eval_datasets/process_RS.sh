@@ -70,3 +70,6 @@ cdo -L -b F64 -chname,__xarray_dataarray_variable__,agpp \
     -timmean -selyear,2003/2021 MODIS_GPP.nc MODIS_GPP_timmean.nc
 
 cdo -L -b F64 -timmean -selyear,2003/2021 MODIS_LAI.nc MODIS_LAI_timmean.nc
+
+cdo -L -b F64 -timmean -yearsum -selyear,2003/2018 CAMS-GFAS_fire_CO2.nc \
+    CAMS-GFAS_fire_CO2_timmean.nc
