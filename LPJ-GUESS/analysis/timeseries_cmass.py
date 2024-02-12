@@ -29,7 +29,7 @@ def get_ens_stat(var,exp):
     ### Create dataframe where each column is the timeseries of one GCM
     df = pd.DataFrame()
     for GCM in GCM_list:
-        df[GCM] = open_data(var,GCM,exp)*100
+        df[GCM] = open_data(var,GCM,exp)
 
     ### Get ensemble mean and standard deviation
     df['Ensemble mean'] = df[GCM_list].mean(axis=1)
