@@ -118,52 +118,46 @@ def plot_timeseries(var, PFT, scen, sens, axis):
             if sens == 'nofire':
                 if axis in (ax6,ax7,ax8,ax9):
                     axis.axhline(color='tab:grey',lw=0.5)                    
+            elif sens == 'FHSF':
+                if axis in (ax3,ax5,ax6,ax8,ax9):
+                    axis.axhline(color='tab:grey',lw=0.5)
+        elif scen == 'RCP85':
+            if sens == 'nofire':
+                if axis in (ax6,ax8,ax9):
+                    axis.axhline(color='tab:grey',lw=0.5)
+            elif sens == 'FHSF':
+                if axis in (ax2,ax3,ax4,ax5,ax6,ax8,ax9):
+                    axis.axhline(color='tab:grey',lw=0.5)
 
     if var == 'cmass':
         if scen == 'RCP45':
             if sens == 'nofire':
                 if axis in (ax1,ax3,ax6,ax7,ax8):
                     axis.axhline(color='tab:grey',lw=0.5)
-
-    if var == 'cmass':
-        if scen == 'RCP85':
+            elif sens == 'FHSF':
+                if axis in (ax2,ax3,ax4,ax6,ax8,ax9):
+                    axis.axhline(color='tab:grey',lw=0.5)
+        elif scen == 'RCP85':
             if sens == 'nofire':
                 if axis in (ax6,ax7,ax8):
                     axis.axhline(color='tab:grey',lw=0.5)
-
-    if var == 'fpc':
-        if scen == 'RCP45':
-            if sens == 'FHSF':
-                if axis in (ax3,ax5,ax6,ax8,ax9):
-                    axis.axhline(color='tab:grey',lw=0.5)
-
-    if var == 'fpc':
-        if scen == 'RCP85':
-            if sens == 'FHSF':
-                if axis in (ax2,ax3,ax4,ax5,ax6,ax8,ax9):
-                    axis.axhline(color='tab:grey',lw=0.5)
-
-    if var == 'cmass':
-        if scen == 'RCP45':
-            if sens == 'FHSF':
-                if axis in (ax2,ax3,ax4,ax6,ax8,ax9):
-                    axis.axhline(color='tab:grey',lw=0.5)
-
-    if var == 'cmass':
-        if scen == 'RCP85':
-            if sens == 'FHSF':
+            elif sens == 'FHSF':
                 if axis in (ax2,ax3,ax4,ax5,ax6,ax8,ax9):
                     axis.axhline(color='tab:grey',lw=0.5)
 
     if var == 'clitter':
         if scen == 'RCP45':
-            if sens == 'FHSF':
+            if sens == 'nofire':
+                if axis in (ax1,ax2,ax3,ax5,ax6,ax7,ax8):
+                    axis.axhline(color='tab:grey',lw=0.5)
+            elif sens == 'FHSF':
                 if axis in (ax1,ax2,ax3,ax4,ax5,ax6,ax8,ax9):
                     axis.axhline(color='tab:grey',lw=0.5)
-
-    if var == 'clitter':
-        if scen == 'RCP85':
-            if sens == 'FHSF':
+        elif scen == 'RCP85':
+            if sens == 'nofire':
+                if axis in (ax1,ax5,ax6,ax7,ax8):
+                    axis.axhline(color='tab:grey',lw=0.5)    
+            elif sens == 'FHSF':
                 if axis in (ax1,ax2,ax3,ax4,ax5,ax6,ax8,ax9):
                     axis.axhline(color='tab:grey',lw=0.5)
 
@@ -197,13 +191,15 @@ for a in (ax1,ax4,ax7):
         a.set_ylabel('$\Delta$ Percentage carbon\nstored in litter [%]')
 
 ### Sometime loc='best' looked crappy so I manually set the legend position
-if sens == 'FHSF':
-    ax9.legend(loc='upper right',frameon=False)
-elif sens == 'nofire':
-    if var == 'cmass':
-        ax4.legend(loc='lower left',frameon=False)
-    else:
-        ax7.legend(loc='lower left',frameon=False)
+# if sens == 'FHSF':
+#     ax9.legend(loc='upper right',frameon=False)
+# elif sens == 'nofire':
+#     if var == 'cmass':
+#         ax7.legend(loc='lower left',frameon=False)
+#     else:
+        # ax7.legend(loc='lower left',frameon=False)
+
+ax9.legend(loc='best',frameon=False)
 
 fig.align_ylabels()
 plt.tight_layout()
