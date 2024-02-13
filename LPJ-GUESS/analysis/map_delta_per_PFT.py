@@ -12,8 +12,8 @@ import argparse
 
 '''
 Initialise argument parsing: 
-var for variable (in report we used fpc, cmass, clitter
-scen for RCP scenario (rcp45 or rcp85)
+var for variable (in report we used fpc, cmass, clitter)
+scen for RCP scenario (RCP45 or RCP85)
 first_year and last_year for fut. projection timeslice (2045-2059 or 2085-2099)
 '''
 
@@ -201,5 +201,5 @@ for p in (6,7,8):
 plt.subplots_adjust(top=0.95, left=0.05, right=0.975, bottom=0.15,
                     wspace=0.2, hspace=0.1)
 
-plt.savefig('figures/'+args.var+'_'+args.scen+'_'+args.first_year+'-'+
-            args.last_year+'.png',dpi=400)
+plt.savefig('figures/map_delta_'+var+'_'+scen+'_'+first_year+'-'+
+            last_year+'.png',dpi=400)
