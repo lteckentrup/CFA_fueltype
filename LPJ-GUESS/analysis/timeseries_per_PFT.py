@@ -33,12 +33,12 @@ args = parser.parse_args()
 ### Assign variables
 var=args.var
 
-def open_data(var,PFT,GCM,exp):
+def open_data(var,PFT,GCM,scen):
     if var == 'fpc':
-        ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+GCM+'_'+exp+
+        ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+GCM+'_'+scen+
                              '/'+var+'_1960-2099_fldmean.nc')    
     else:
-        ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+GCM+'_'+exp+
+        ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+GCM+'_'+scen+
                              '/'+var+'_1960-2099_fldsum.nc')  
 
     ### Show PFT as fraction of Total 
@@ -47,13 +47,13 @@ def open_data(var,PFT,GCM,exp):
     ### Only show future projections?
     return(da.sel(time=slice('2005','2099')).values.flatten())
 
-def get_ens_stat(var,PFT,exp):
+def get_ens_stat(var,PFT,scen):
     global GCM_list
 
     ### Create dataframe where each column is the timeseries of one GCM
     df = pd.DataFrame()
     for GCM in GCM_list:
-        df[GCM] = open_data(var,PFT,GCM,exp)*100 
+        df[GCM] = open_data(var,PFT,GCM,scen)*100 
 
     ### Get ensemble mean and standard deviation
     df['Ensemble mean'] = df[GCM_list].mean(axis=1)
@@ -64,15 +64,15 @@ def get_ens_stat(var,PFT,exp):
     df['time'] = np.arange(2005,2100,1)
     return(df)
      
-def plot_timeseries(var, PFT, exp, axis, color):
+def plot_timeseries(var, PFT, scen, axis, color):
     ### Get dataframe with ensemble stats
-    df = get_ens_stat(var,PFT,exp)
+    df = get_ens_stat(var,PFT,scen)
 
     ### Plot timeseries of ensemble mean
     axis.plot(df['time'],
               df['Ensemble mean'],
               color=color,
-              label=exp[:4]+'.'+exp[4:])
+              label=scen[:4]+'.'+scen[4:])
     
     ### Plot shaded area of ensemble mean +- ensemble standard deviation
     axis.fill_between(df['time'],
@@ -101,15 +101,15 @@ title_index=['a)','b)','c)','d)','e)','f)','g)','h)','i)']
 axes = [ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9]
 
 ### Plot timeseries
-exp='RCP45'
+scen='RCP45'
 color = 'tab:blue'
 for PFT_S,ax in zip(PFT_short_names,axes):
-    plot_timeseries(var,PFT_S,exp,ax,color)
+    plot_timeseries(var,PFT_S,scen,ax,color)
 
-exp='RCP85'
+scen='RCP85'
 color = 'tab:red'
 for PFT_S,ax in zip(PFT_short_names,axes):
-    plot_timeseries(var,PFT_S,exp,ax,color)
+    plot_timeseries(var,PFT_S,scen,ax,color)
 
 ### Set title
 for ax, PFT_L in zip(axes,PFT_longnames):
