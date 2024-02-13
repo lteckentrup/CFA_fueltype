@@ -163,14 +163,14 @@ fig, axs = plt.subplots(nrows=2,ncols=2,
                         figsize=(10,7))
 axs=axs.flatten()
 
-var_short_names = ['cmass','cmass_wood','cmass_leaf','cmass_litter']
+var_short_names = ['cmass','cmass_wood','cmass_leaf','clitter']
 var_titles = ['Carbon stored in vegetation','Carbon stored in wood',
               'Carbon stored in leaves','Carbon stored in litter']
 positions=[0,1,2,3]
 title_index=['a)','b)','c)','d)']
 
 ### Loop through plot command, and adjust subplot titles
-for varss, vart,p,ti in zip(var_short_names, var_titles,positions,title_index):
+for vars, vart,p,ti in zip(var_short_names, var_titles,positions,title_index):
     make_map(vars,first_year,last_year,scen,p)
     axs[p].set_title(vart)
     axs[p].set_title(ti, loc='left')
