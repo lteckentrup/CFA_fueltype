@@ -92,7 +92,7 @@ def make_map(var,PFT,first_year,last_year,scen,position):
     ### Get latitude and longitude coordinates
     lat, lon = diff.lat, diff.lon
 
-    ### Set projections
+    ### Set projection
     projection = ccrs.PlateCarree()   
     
     ### Set boundary norm
