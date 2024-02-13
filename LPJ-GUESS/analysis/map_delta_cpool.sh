@@ -1,0 +1,10 @@
+for var in fpc cmass clitter; do
+    echo ${var}
+    for scen in RCP45 RCP85; do
+        echo ${scen}       
+        python3.9 map_delta_cpool.py --scen ${scen} \
+                                     --first_year '2045' --last_year '2059'
+        python3.9 map_delta_cpool.py --scen ${scen} \
+                                     --first_year '2085' --last_year '2099'
+    done
+done
