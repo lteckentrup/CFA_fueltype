@@ -31,11 +31,14 @@ scen=args.scen
 first_year=args.first_year
 last_year=args.last_year
 
+### Set pathway where input files are located
 pathwayIN = ('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
              'dynamics_simulations/CFA/LPJ-GUESS/')
 
 ### Open files and get change in variables for defined timeslice
 def get_data(var,PFT,first_year,last_year,GCM,scen):
+    global pathwayIN
+    
     ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+
                          GCM+'_'+scen+'/'+var+'_1960-2099.nc')
 
