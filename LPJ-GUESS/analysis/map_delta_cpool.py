@@ -12,7 +12,7 @@ import argparse
 
 '''
 Initialise argument parsing: 
-scen for RCP scenario (rcp45 or rcp85)
+scen for RCP scenario (RCP45 or RCP85)
 first_year and last_year for fut. projection timeslice (2045-2059 or 2085-2099)
 '''
 
