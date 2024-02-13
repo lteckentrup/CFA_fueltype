@@ -38,7 +38,7 @@ pathwayIN = ('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
 ### Open files and get change in variables for defined timeslice
 def get_data(var,PFT,first_year,last_year,GCM,scen):
     global pathwayIN
-    
+
     ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+
                          GCM+'_'+scen+'/'+var+'_1960-2099.nc')
 
@@ -61,7 +61,7 @@ def get_data(var,PFT,first_year,last_year,GCM,scen):
 
     return(diff) 
 
-### Set up plot for map
+### Set up plot for maps
 def make_map(var,PFT,first_year,last_year,scen,position):
 
     ### Get ensemble average of change in defined variable
