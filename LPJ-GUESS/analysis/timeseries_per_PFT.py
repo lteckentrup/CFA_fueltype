@@ -21,6 +21,11 @@ pathwayIN = ('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
 
 import argparse
 
+'''
+Initialise argument parsing: 
+var for variable (in report we used fpc, cmass, clitter)
+'''
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--var', type=str, required=True)
 args = parser.parse_args()
