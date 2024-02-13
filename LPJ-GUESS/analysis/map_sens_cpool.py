@@ -12,7 +12,7 @@ import argparse
 
 '''
 Initialise argument parsing: 
-scen for RCP scenario (rcp45 or rcp85)
+scen for RCP scenario (RCP45 or RCP85)
 sens for sensitivity test: 
 nofire (fire switched of) 
 FHSF  (frequent high severity fire)
@@ -91,7 +91,6 @@ def make_map(var,first_year,last_year,scen,sens,position):
 
     ### Plot map
     p = axs[position].pcolormesh(lon, lat, diff, cmap=cmap, norm=norm)
-
 
     ### Add state borders
     states_provinces = cfeature.NaturalEarthFeature(
