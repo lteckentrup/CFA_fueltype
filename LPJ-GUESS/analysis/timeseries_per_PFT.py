@@ -30,6 +30,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--var', type=str, required=True)
 args = parser.parse_args()
 
+### Assign variables
+var=args.var
+
 def open_data(var,PFT,GCM,exp):
     if var == 'fpc':
         ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+GCM+'_'+exp+
@@ -98,7 +101,6 @@ title_index=['a)','b)','c)','d)','e)','f)','g)','h)','i)']
 axes = [ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9]
 
 ### Plot timeseries
-var=args.var
 exp='RCP45'
 color = 'tab:blue'
 for PFT_S,ax in zip(PFT_short_names,axes):
