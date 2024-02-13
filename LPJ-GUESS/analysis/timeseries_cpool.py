@@ -14,22 +14,22 @@ GCM_list = ['CNRM-CERFACS-CNRM-CM5', 'CSIRO-BOM-ACCESS1-0',
 pathwayIN = ('/data/hiestorage/WorkingData/MEDLYN_GROUP/PROJECTS/'
              'dynamics_simulations/CFA/LPJ-GUESS/')
 
-def open_data(var,GCM,exp):
+def open_data(var,GCM,scen):
     ds = xr.open_dataset(pathwayIN+'/output/netCDF/NHP/runs_'+
-                         GCM+'_'+exp+'/'+var+'_1960-2099_fldsum.nc')  
+                         GCM+'_'+scen+'/'+var+'_1960-2099_fldsum.nc')  
     da = ds['Total']
 
     ### Only show future projections?
     return(da.sel(time=slice('2005','2099')).values.flatten())
 
 ### Get ensemble 'stats' - such a small ensemble size  ¯\_(ツ)_/¯
-def get_ens_stat(var,exp):
+def get_ens_stat(var,scen):
     global GCM_list
 
     ### Create dataframe where each column is the timeseries of one GCM
     df = pd.DataFrame()
     for GCM in GCM_list:
-        df[GCM] = open_data(var,GCM,exp)
+        df[GCM] = open_data(var,GCM,scen)
 
     ### Get ensemble mean and standard deviation
     df['Ensemble mean'] = df[GCM_list].mean(axis=1)
@@ -40,14 +40,14 @@ def get_ens_stat(var,exp):
     df['time'] = np.arange(2005,2100,1)
     return(df)
      
-def plot_timeseries(var, exp, axis, color):
+def plot_timeseries(var, scen, axis, color):
     ### Get dataframe with ensemble stats
-    df = get_ens_stat(var,exp)
+    df = get_ens_stat(var,scen)
     
     ### Plot timeseries of ensemble mean
     axis.plot(df['time'],
               df['Ensemble mean'],
-              label=exp[:4]+'.'+exp[4:],
+              label=scen[:4]+'.'+scen[4:],
               color=color)
     
     ### Plot shaded area of ensemble mean +- ensemble standard deviation
@@ -61,19 +61,19 @@ def plot_timeseries(var, exp, axis, color):
     axis.spines['right'].set_visible(False)
     axis.spines['top'].set_visible(False)
 
-exp='RCP45'
+scen='RCP45'
 color='tab:blue'
-plot_timeseries('cmass',exp,ax1,color)
-plot_timeseries('cmass_leaf',exp,ax2,color)
-plot_timeseries('cmass_wood',exp,ax3,color)
-plot_timeseries('clitter',exp,ax4,color)
+plot_timeseries('cmass',scen,ax1,color)
+plot_timeseries('cmass_leaf',scen,ax2,color)
+plot_timeseries('cmass_wood',scen,ax3,color)
+plot_timeseries('clitter',scen,ax4,color)
 
-exp='RCP85'
+scen='RCP85'
 color='tab:red'
-plot_timeseries('cmass',exp,ax1,color)
-plot_timeseries('cmass_leaf',exp,ax2,color)
-plot_timeseries('cmass_wood',exp,ax3,color)
-plot_timeseries('clitter',exp,ax4,color)
+plot_timeseries('cmass',scen,ax1,color)
+plot_timeseries('cmass_leaf',scen,ax2,color)
+plot_timeseries('cmass_wood',scen,ax3,color)
+plot_timeseries('clitter',scen,ax4,color)
 
 ### Hide ticklabels for upper two panels
 for a in (ax1,ax2):
@@ -97,4 +97,4 @@ ax4.set_title('d)', loc='left')
 ax4.legend(loc='upper left',frameon=False)
 fig.align_ylabels()
 plt.tight_layout()
-plt.savefig('figures/timeseries_cmass.pdf')
+plt.savefig('figures/timeseries_cpool.pdf')
