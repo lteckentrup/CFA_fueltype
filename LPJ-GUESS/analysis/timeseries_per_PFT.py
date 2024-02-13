@@ -123,4 +123,4 @@ for ax in (ax1,ax4,ax7):
 ax9.legend(loc='upper right',frameon=False)
 fig.align_ylabels()
 plt.tight_layout()
-plt.savefig('figures/timeseries_'+var+'per_PFT.pdf')
+plt.savefig('figures/timeseries_'+var+'_per_PFT.pdf')
