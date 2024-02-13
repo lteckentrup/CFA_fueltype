@@ -1,10 +1,11 @@
-import xarray as xr
 import numpy as np
+import seaborn as sns
+import xarray as xr
+
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from  matplotlib.colors import ListedColormap, BoundaryNorm
-import seaborn as sns
 import matplotlib.patches as mpatches
 
 import argparse
