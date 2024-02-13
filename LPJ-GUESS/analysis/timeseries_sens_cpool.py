@@ -18,7 +18,7 @@ import argparse
 
 '''
 Initialise argument parsing: 
-scen for RCP scenario (rcp45 or rcp85)
+scen for RCP scenario (RCP45 or RCP85)
 sens for sensitivity test: 
 nofire (fire switched of) 
 FHSF  (frequent high severity fire)
