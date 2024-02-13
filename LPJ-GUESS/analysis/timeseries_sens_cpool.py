@@ -21,7 +21,7 @@ Initialise argument parsing:
 scen for RCP scenario (rcp45 or rcp85)
 sens for sensitivity test: 
 nofire (fire switched of) 
-FHFS  (frequent high severity fire)
+FHSF  (frequent high severity fire)
 '''
 
 parser = argparse.ArgumentParser()
