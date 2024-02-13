@@ -55,7 +55,8 @@ def get_data(var,PFT,first_year,last_year,GCM,scen,sens):
         da_sens = (ds_sens[PFT]/ds_sens['Total'])*100
         da = (ds[PFT]/ds['Total'])*100
     else:
-         da = ds[PFT]
+        da_sens = ds_sens[PFT]
+        da = ds[PFT]
 
     ### Get sensitivity: we discussed this before 
     if sens == 'nofire':
