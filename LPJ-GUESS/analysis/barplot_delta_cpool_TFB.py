@@ -153,7 +153,7 @@ for ax, tl, ti in zip(axes,title_labels,title_indices):
 
 ### Set y label
 for ax in (ax1,ax3,ax5,ax7,ax9):
-    ax1.set_ylabel('$\Delta$ Carbon pool\n[PgC]')
+    ax.set_ylabel('$\Delta$ Carbon pool\n[PgC]')
 
 ### Set legend
 ax1.legend(loc='upper center', 
