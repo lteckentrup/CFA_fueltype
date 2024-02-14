@@ -91,7 +91,7 @@ def plot_barplot(FT_group,var1,var2,axis):
     df_mean['Scenarios'] = [var1, var2]
     df_std['Scenarios'] = [var1, var2]
 
-    ### Set scenarios to index
+    ### Set scenario names as index  
     df_mean.set_index('Scenarios', inplace=True)
     df_std.set_index('Scenarios', inplace=True)
 
