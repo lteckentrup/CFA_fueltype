@@ -16,7 +16,7 @@ All timeseries plots are done with ```timeseries*py```. ```timeseries_cpool.py``
 All maps are plotted using ```map*py```, all barplots are plotted using ```barplot_*py```. The structure of the script names is consistent across the different types of plots (so identical to what I described for `timeseries*py```). Again, when python scripts take arguments, there is always an accompanying bash script that loops through all arguments.
 
 # ML
-```LPJ-GUESS``` has all the stuff for the machine learning bit. It has the subdirectories
+```ML``` has all the stuff for the machine learning bit. It has the subdirectories
 
 ```process_input``` has all the scripts that I used for the data prep for the machine learning. ```get_index.py``` elects the coordinates and fuel types from the current fuel type distribution (provided by CFA). ```prep_static.R``` generates a csv file with a dataframe of all static predictors, ```prep_CMIP_hist.R``` generates a csv file where historical CMIP projections are added to the static predictors and saved for each GCM individually. ```prep_CMIP_fut.R``` generates a csv file where future CMIP projections are added to the static predictors and saved for each GCM individually, and also each RCP scenario and timeslice are saved in separate files. Both ```prep_CMIP*R``` take the arguments GCM, scen, and time identifier (mid, long) and the associated years (20452060, 20852100). ```get_hist_predictors.sh``` and ```get_fut_predictors.sh``` run all ```prep_CMIP_hist.R``` and ```prep_CMIP_fut.R```, respectively. Jim did some of the initial processing and you'd need to look that up on what he left.
 
