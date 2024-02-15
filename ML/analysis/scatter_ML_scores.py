@@ -77,6 +77,7 @@ def plot_stripplot(score,axis):
 
     ### Create dataframe with average score for each method
     df_mean = pd.DataFrame()
+    
     ### Get fuel types and add three extra rows macro average, accuracy, and 
     ### weighted average that come out of report
     df_mean['FT'] = sorted(FT_list_sorted)+['macro avg']+['accuracy']+['weighted avg']
