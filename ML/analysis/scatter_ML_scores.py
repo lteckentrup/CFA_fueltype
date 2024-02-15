@@ -52,7 +52,7 @@ def get_score_ML(ML,score):
     return(df['Mean'].values.flatten(), 
            df['Std'].values.flatten())
 
-def stripplot_FG(score,axis):
+def plot_stripplot(score,axis):
     ### Prepare colormap: First get list of fuel types and respective color
     FT_list = Wet_Shrubland + Wet_Forest + Grassland + Dry_forest + \
               Shrubland + High_elevation + Mallee
@@ -137,7 +137,7 @@ title_indices = ['a)','b)','c)']
 axes=[ax1,ax2,ax3]
 
 for s,tl,ti,ax in zip(scores,title_labels,title_indices,axes):
-    stripplot_FG(s,ax)
+    plot_stripplot(s,ax)
     ax.set_title(tl)
     ax.set_title(ti, loc='left')
 
