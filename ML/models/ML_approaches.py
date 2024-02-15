@@ -2,22 +2,30 @@
 ### Preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+'''
+I tested a bunch of resampling methods to address
+the imbalance in the dataset but in the end wrote a 
+function that undersampled all classes to a specified 
+threshold. There were a few fuel types where the threshold
+exceeded the sample size but I didn't want to reduce the 
+overall sample size too aggressively
+'''
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.over_sampling import RandomOverSampler
 from imblearn.under_sampling import NeighbourhoodCleaningRule
 
 ### Methods
+### PCA for dimension reduction
 from sklearn.decomposition import PCA
 from sklearn.model_selection import GridSearchCV
-from sklearn.naive_bayes import GaussianNB
+
+### Machine learning approaches
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
-from imblearn.ensemble import BalancedRandomForestClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import GradientBoostingClassifier
 
-### Interpretation
+### Evaluation of results
 from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
@@ -35,18 +43,30 @@ import numpy as np
 import joblib
 import argparse
 
+'''
+Initialise argument parsing: 
+GCM for the different ensemble members: ACCESS1-0 BNU-ESM 
+CSIRO-Mk3-6-0 GFDL-CM3 GFDL-ESM2G GFDL-ESM2M INM-CM4 
+IPSL-CM5A-LR MRI-CGCM3
+classifier for the machine learning methods: Nearest Neighbor,
+Random forest, Neural Network
+model_name for short for of ML method: kNN, RF, MLP
+reduce_dim for PCA dimension reduction: 'PCA' or 'None'
+'''
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--GCM', type=str, required=True)
 parser.add_argument('--classifier', type=str, required=True)
+parser.add_argument('--model_name', type=str, required=True)
 parser.add_argument('--reduce_dim', type=str, required=True)
 args = parser.parse_args()
 
-### Set seed for reproducability
+### Set seed for reproducability (results are not sensitive to seed though)
 random.seed(42)
 
 def get_data(GCM):
     ### Read in features + target
-    df = pd.read_csv('../fuelType_ML/cache/ft.'+GCM+'.history.csv')
+    df = pd.read_csv('../fuelType_ML/cache/pred.'+GCM+'.history.csv')
 
     ### Drop Temperate Grassland / Sedgeland (3020) and
     ###      Eaten Out Grass when it's NOT on public land
@@ -78,14 +98,14 @@ def prep_data(GCM,reduce_dim):
     df = get_data(GCM)
 
     '''
-    We tested some sampling approaches, such as random undersampling, random oversampling, 
+    I tested some sampling approaches, such as random undersampling, random oversampling, 
     neighbourhood cleaning rule, SMOTE - but got best results by randomly selecting
-    10'000 samples for each class (see below).
+    125'190 samples for each class (see below).
     In random forest, data do not need to be normalised but they should be scaled
     for MLP
     '''
     
-    n_samples = 10000
+    n_samples = 125190
     df_sampled = pd.DataFrame()
 
     ### Loop through all fuel types
@@ -93,7 +113,7 @@ def prep_data(GCM,reduce_dim):
         ### Get fuel type
         subset = df[df['FT'] == value]
         
-        ### 5 classes have less than 10'000 classes
+        ### 5 classes have less than n_samples
         n_samples_final = min(n_samples, len(subset))
         
         ### Randomly pull out 10'000 samples !set replace = False to avoid 
@@ -201,6 +221,8 @@ def hypertuning(classifier, GCM, reduce_dim):
         'Random Forest': (RandomForestClassifier(), 
                           {'n_estimators': [200, 500, 800], 
                            'min_samples_split': [2, 5, 10],
+                           ### I kep the class weights in because the data are 
+                           ### still not *quite* balanced
                            'class_weight': [None, 'balanced', 'balanced_subsample']
                           }
                          ),                   
@@ -236,24 +258,67 @@ def hypertuning(classifier, GCM, reduce_dim):
         # Classifier does not have hyperparameters
         best_params = {}
 
-def ML_function(GCM,reduce_dim,classifier):
+def ML_function(GCM,reduce_dim,classifier,model_name):
     ### Grab data
     X_train, X_test, y_train, y_test, feature_names = prep_data(GCM,
                                                                 reduce_dim)
 
     print(X_train)
+
+    ### Set hyper parameters
+    params_by_classifier = {
+        'Nearest Neighbor': {
+            'PCA': {'n_neighbors': 29, 
+                   'p': 1, 
+                   'weights': 'distance'}, 
+            'None': {'n_neighbors': 25, 
+                    'p': 1, 
+                    'weights': 'distance'}
+                    },
+        'Random Forest': {
+            'PCA': {'max_depth': None, 
+                   'min_samples_split': 2, 
+                   'n_estimators': 800, 
+                   'class_weight': 'balanced_subsample', 
+                   'n_jobs':-1},
+            'None': {'max_depth': None, 
+                    'min_samples_split': 2, 
+                    'n_estimators': 800, 
+                    'class_weight': 'balanced_subsample', 
+                    'n_jobs':-1}
+                    },
+        'Neural Network': {
+            'PCA': {'activation': 'tanh',
+                   'alpha': 0.0001, 
+                   'hidden_layer_sizes': (10, 30, 10),
+                   'learning_rate': 'adaptive',
+                   'solver': 'adam'},
+            'None': {'activation': 'tanh',
+                    'alpha': 0.0001, 
+                    'hidden_layer_sizes': (10, 30, 10),
+                    'learning_rate': 'constant',
+                    'solver': 'adam'},
+        }
+    }
+
+    ### Define classifiers
+    classifiers = {
+        'Nearest Neighbor': KNeighborsClassifier,
+        'Random Forest': RandomForestClassifier,
+        'Neural Network': MLPClassifier
+    }
+
+    ### Pass optimal paramters
+    opt_params = params_by_classifier[classifier][reduce_dim]
+
     ### Set up model
-    clf = RandomForestClassifier(max_depth = None, 
-                                 min_samples_split = 2, 
-                                 n_estimators= 800, 
-                                 class_weight = 'balanced_subsample',
-                                 n_jobs=-1)
+    clf = classifiers[classifier](**opt_params)
 
     ### Fit model
     clf.fit(X_train, y_train)
 
     ### Save model for predictions
-    joblib.dump(clf, 'pkl/'+GCM+'/random_forest_'+GCM+'.pkl')
+    joblib.dump(clf, 'pkl/'+GCM+'/'+model_name+'_'+GCM+'.pkl')
     
     ### Predict on test data
     y_pred = clf.predict(X_test)
@@ -276,16 +341,22 @@ def ML_function(GCM,reduce_dim,classifier):
     accuracies.append(accuracy)
     accuracies.append(weighted_accuracy)
 
-    ### Get importance
-    importances = clf.feature_importances_
-    std = np.std([tree.feature_importances_ for tree in clf.estimators_],
-                  axis=0)
+    if classifier == 'Random Forest':
+        ### Get feature importance
+        importances = clf.feature_importances_
 
-    importances_df = pd.DataFrame({'feature': feature_names,
-                                   'importance': importances,
-                                   'std': std})
-    print(importances_df.sort_values(by=['importance'], ascending=False))
-    importances_df.to_csv(GCM+'_importance_individual.csv')
+        ### Get importance uncertainty
+        std = np.std([tree.feature_importances_ for tree in clf.estimators_],
+                    axis=0)
+
+        ### Build dataframe
+        importances_df = pd.DataFrame({'feature': feature_names,
+                                       'importance': importances,
+                                       'std': std})
+
+        ### Print and save to csv
+        print(importances_df.sort_values(by=['importance'], ascending=False))
+        importances_df.to_csv(GCM+'_importance_individual.csv')
 
     if classifier == 'Random Forest':
         ### Calculate maximum depth of tree
@@ -304,8 +375,9 @@ def ML_function(GCM,reduce_dim,classifier):
     report = classification_report(y_test, y_pred, output_dict=True)
     df_report = pd.DataFrame(report).transpose()
     df_report['accuracy'] = accuracies
-    df_report.to_csv('csv/'+GCM+'/'+GCM+'_report.csv')
+    df_report.to_csv('csv/'+GCM+'/'+model_name+'_'+GCM+'_report.csv')
 
     return(y_test,y_pred)
 
-hypertuning(args.classifier, args.GCM, args.reduce_dim)
+# hypertuning(args.classifier, args.GCM, args.reduce_dim)
+ML_function(args.GCM,args.reduce_dim,args.classifier,args.model_name)
