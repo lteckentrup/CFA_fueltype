@@ -128,7 +128,7 @@ def plot_stripplot(score,axis):
     axis.set_xlabel('')
     axis.set_ylabel('')
 
-    ### Set same y-lims for each plot
+    ### Set same y-lims for each subplot
     axis.set_ylim(-0.05,1)
 
 scores = ['accuracy','precision','recall']
