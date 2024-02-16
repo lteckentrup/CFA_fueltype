@@ -142,6 +142,10 @@ for s,tl,ti,ax in zip(scores,title_labels,title_indices,axes):
     ax.set_title(ti, loc='left')
 
 ### Plot custom legend: Group into broad fuel groups
+### Sorry this is really a bit convoluted. Could probably also
+### define one legend and then include white markers and no titles
+### sort the fuel groups in the legend
+
 ### Define labels
 labels = {
     'Wet_Forest': Wet_Forest_labels,
