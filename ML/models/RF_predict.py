@@ -75,7 +75,7 @@ def prep_data(fuel_group,GCM,scen,timespan):
 
 def predict_fut(fuel_group,GCM,scen,timespan):
     X, feature_names = prep_data(fuel_group,GCM,scen,timespan)
-    clf = joblib.load(('pkl/'+GCM+'/random_forest_'+GCM+'.pkl'))
+    clf = joblib.load(('pkl/'+GCM+'/RF_'+GCM+'.pkl'))
     print('loaded model')
 
     batch_size = 10000 
