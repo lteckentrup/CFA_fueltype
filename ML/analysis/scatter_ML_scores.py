@@ -144,7 +144,8 @@ for s,tl,ti,ax in zip(scores,title_labels,title_indices,axes):
 ### Plot custom legend: Group into broad fuel groups
 ### Sorry this is really a bit convoluted. Could probably also
 ### define one legend and then include white markers and no titles
-### sort the fuel groups in the legend
+### sort the fuel groups in the legend but I only realised once I 
+### made the legend like this
 
 ### Define labels
 labels = {
