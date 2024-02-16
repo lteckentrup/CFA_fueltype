@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 
 ### Methods
 from sklearn.ensemble import RandomForestClassifier
+import xgboost as xgb
 
 ### Interpretation
 from sklearn.metrics import classification_report
@@ -11,6 +12,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.metrics import roc_curve
 
+### Class weights
+from sklearn.utils.class_weight import compute_class_weight
 
 ### Other libraries
 import pandas as pd
@@ -21,6 +24,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--GCM', type=str, required=True)
+parser.add_argument('--n_samples', type=int, required=True)
 args = parser.parse_args()
 
 ### Set seed for reproducability
@@ -28,34 +32,46 @@ random.seed(42)
 
 def get_data(GCM):
     ### Read in features + target
-    df = pd.read_csv('../fuelType_ML/cache/pred.'+GCM+'.history.csv')
+    df = pd.read_csv('../input/cache/pred.'+GCM+'.history.csv')
     df.rename(columns={'ft': 'FT'},inplace=True)
+
+    ### Drop Temperate Grassland / Sedgeland (3020) and
+    ###      Eaten Out Grass when it's NOT on public land
     df = df.loc[~((df['FT'] == 3020) & (df['tenure'] == 0)),:]
     df = df.loc[~((df['FT'] == 3046) & (df['tenure'] == 0)),:]
 
+    ### Drop Water, sand, no vegetation (3000)
     df.replace(3000, np.nan, inplace=True)
+
+    ### Drop Non-Combustible (3047)
     df.replace(3047, np.nan, inplace=True)
+
+    ### Drop Orchard / Vineyard (3097),
+    ###      Softwood Plantation (3098) and
+    ###      Hardwood Plantation (3099)
     df.replace(3097, np.nan, inplace=True)
     df.replace(3098, np.nan, inplace=True)
     df.replace(3099, np.nan, inplace=True)
 
+    ### Set inf to Nan
     df.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+    ### Drop all NaN
     df.dropna(inplace=True)
-    
+
     return(df)        
 
-def prep_data(GCM,reduce_dim):
-    df = get_data(GCM)
+'''
+sample sizes I tried
+1161998
+813398
+10107368
+'''
 
-    '''
-    We tested some sampling approaches, such as random undersampling, random oversampling, 
-    neighbourhood cleaning rule, SMOTE - but got best results by randomly selecting
-    10'000 samples for each class (see below).
-    In random forest, data do not need to be normalised but they should be scaled
-    for MLP
-    '''
+def prep_data(GCM,n_samples,reduce_dim):
+    df = get_data(GCM)
     
-    n_samples = 10000
+    n_samples = n_samples
     df_sampled = pd.DataFrame()
 
     ### Loop through all fuel types
@@ -96,26 +112,24 @@ def prep_data(GCM,reduce_dim):
                     'rh.mean',
                     'awc']]
     
-    ### Use all predictors
-    ### 
+    ### Split data in to training and test datasets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)   
-    print(X_train)
 
     ### Get feature names
     feature_names = X.columns
 
     return(X_train, X_test, y_train, y_test, feature_names)
 
-def ML_function(GCM,reduce_dim):
+def ML_function(GCM,n_samples,reduce_dim):
     ### Grab data
     X_train, X_test, y_train, y_test, feature_names = prep_data(GCM,
+                                                                n_samples,
                                                                 reduce_dim)
 
-    print(X_train)
     ### Set up model
-    clf = RandomForestClassifier(max_depth = None, 
-                                 min_samples_split = 2, 
-                                 n_estimators= 800, 
+    clf = RandomForestClassifier(max_depth = 20, 
+                                 min_samples_split = 10, 
+                                 n_estimators= 500, 
                                  class_weight = 'balanced_subsample',
                                  n_jobs=-1)
 
@@ -123,30 +137,37 @@ def ML_function(GCM,reduce_dim):
     clf.fit(X_train, y_train)
 
     ### Save model for predictions
-    joblib.dump(clf, 'pkl/'+GCM+'/random_forest_'+GCM+'.pkl')
+    joblib.dump(clf, 'pkl/'+GCM+'/RF_'+GCM+'_'+str(n_samples)+'.pkl')
     
     ### Predict on test data
     y_pred = clf.predict(X_test)
-    y_pred_prob = clf.predict_proba(X_test)
 
-    class_names = clf.classes_  # Get the class names from the classifier
+    ### You can also save the probability for each class (the probabilities give
+    ### some indication on prediction confidence) but CFA wasn't interested in 
+    ### those outputs. They can be retried using
+    #### y_pred_prob = clf.predict_proba(X_test)
 
-    df_y = pd.DataFrame(y_pred_prob, columns=class_names)
+    class_names = clf.classes_  ### Get the class names from the classifier
+
+    ### Dataframe with predicted fuel types
+    df_y = pd.DataFrame()
     df_y['win'] = y_pred
 
-    df_y.to_csv('csv/'+GCM+'/'+'y_pred_'+GCM+'.csv')
+    ### Save to csv file
+    df_y.to_csv('csv/'+GCM+'/'+'y_pred_'+GCM+'_'+str(n_samples)+'.csv')
 
     ### Calculate overall accuracy
     accuracy = clf.score(X_test, y_pred)
     weighted_accuracy = balanced_accuracy_score(y_test, y_pred)
 
     classes = np.unique(y_test)
-    accuracies = [accuracy_score(y_test[y_test == c], y_pred[y_test == c]) for c in classes]
+    accuracies = [accuracy_score(y_test[y_test == c], 
+                                 y_pred[y_test == c]) for c in classes]
     accuracies.append(accuracy)
     accuracies.append(accuracy)
     accuracies.append(weighted_accuracy)
 
-    ### Get importance
+    ### Get feature importance
     importances = clf.feature_importances_
     std = np.std([tree.feature_importances_ for tree in clf.estimators_],
                   axis=0)
@@ -155,7 +176,7 @@ def ML_function(GCM,reduce_dim):
                                    'importance': importances,
                                    'std': std})
     print(importances_df.sort_values(by=['importance'], ascending=False))
-    importances_df.to_csv(GCM+'_importance_individual.csv')
+    importances_df.to_csv(GCM+'_'+str(n_samples)+'_importance_individual.csv')
 
     ### Calculate maximum depth of tree
     depths = [tree.tree_.max_depth for tree in clf.estimators_]
@@ -171,8 +192,8 @@ def ML_function(GCM,reduce_dim):
     report = classification_report(y_test, y_pred, output_dict=True)
     df_report = pd.DataFrame(report).transpose()
     df_report['accuracy'] = accuracies
-    df_report.to_csv('csv/'+GCM+'/'+GCM+'_report.csv')
+    df_report.to_csv('csv/'+GCM+'/'+GCM+'_'+str(n_samples)+'_report.csv')
 
     return(y_test,y_pred)
 
-ML_function(args.GCM,False)
+ML_function(args.GCM,args.n_samples,False)
