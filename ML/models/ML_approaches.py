@@ -3,12 +3,11 @@
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 '''
-I tested a bunch of resampling methods to address
-the imbalance in the dataset but in the end wrote a 
-function that undersampled all classes to a specified 
-threshold. There were a few fuel types where the threshold
-exceeded the sample size but I didn't want to reduce the 
-overall sample size too aggressively
+I tried a bunch of resampling methods to address the imbalance in the fuel type 
+distribution but in the end wrote a function that undersampled all classes to a 
+specified threshold. There were a few fuel types where the threshold exceeded 
+the sample size but I didn't want to reduce the overall sample size too 
+aggressively
 '''
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
@@ -50,7 +49,7 @@ CSIRO-Mk3-6-0 GFDL-CM3 GFDL-ESM2G GFDL-ESM2M INM-CM4
 IPSL-CM5A-LR MRI-CGCM3
 classifier for the machine learning methods: Nearest Neighbor,
 Random forest, Neural Network
-model_name for short for of ML method: kNN, RF, MLP
+model_name short for ML method (goes into file name): kNN, RF, MLP
 reduce_dim for PCA dimension reduction: 'PCA' or 'None'
 '''
 
@@ -66,7 +65,7 @@ random.seed(42)
 
 def get_data(GCM):
     ### Read in features + target
-    df = pd.read_csv('../fuelType_ML/cache/pred.'+GCM+'.history.csv')
+    df = pd.read_csv('../input/cache/pred.'+GCM+'.history.csv')
 
     ### Drop Temperate Grassland / Sedgeland (3020) and
     ###      Eaten Out Grass when it's NOT on public land
@@ -98,14 +97,18 @@ def prep_data(GCM,reduce_dim):
     df = get_data(GCM)
 
     '''
-    I tested some sampling approaches, such as random undersampling, random oversampling, 
-    neighbourhood cleaning rule, SMOTE - but got best results by randomly selecting
-    125'190 samples for each class (see below).
-    In random forest, data do not need to be normalised but they should be scaled
-    for MLP
+    I tested some sampling approaches, such as random undersampling, 
+    random oversampling, neighbourhood cleaning rule, SMOTE - but got best 
+    results by randomly selecting 125'190 samples for each class (see below). 
+    This was pretty much the maximum size I could use to train the models. 
+    Theoretically, data only need to be normalised for MLP but I normalised them
+    for all three approaches 
     '''
     
+    ### Set threshold for undersampling
     n_samples = 125190
+
+    ### Set up dataframe for resampled data
     df_sampled = pd.DataFrame()
 
     ### Loop through all fuel types
@@ -168,7 +171,8 @@ def prep_data(GCM,reduce_dim):
         X_pca = pca.fit_transform(X_scaled)
 
         ### Split data in to training and test datasets
-        X_train, X_test, y_train, y_test = train_test_split(X_pca, y, test_size=0.3)
+        X_train, X_test, y_train, y_test = train_test_split(X_pca, y, 
+                                                            test_size=0.3)
 
         ### Grab all feature names
         feature_names_full = X.columns
@@ -195,9 +199,12 @@ def prep_data(GCM,reduce_dim):
     
     ### Use all predictors
     elif reduce_dim == 'None':
-        ### 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)   
-        print(X_train)
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        ### Split data in to training and test datasets
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, 
+                                                            test_size=0.3)   
 
         ### Get feature names
         feature_names = X.columns
@@ -221,8 +228,8 @@ def hypertuning(classifier, GCM, reduce_dim):
         'Random Forest': (RandomForestClassifier(), 
                           {'n_estimators': [200, 500, 800], 
                            'min_samples_split': [2, 5, 10],
-                           ### I kep the class weights in because the data are 
-                           ### still not *quite* balanced
+                           ### I kept the class weights in because the data are 
+                           ### still not *quite* balanced. See above
                            'class_weight': [None, 'balanced', 'balanced_subsample']
                           }
                          ),                   
@@ -236,26 +243,26 @@ def hypertuning(classifier, GCM, reduce_dim):
                            )
     }
 
-    # Get the classifier and hyperparameter grid for the specified classifier
+    ### Get the classifier and hyperparameter grid for the specified classifier
     clf, param_grid = classifiers[classifier]
 
     if param_grid:
-        # Create the grid search object
+        ### Create the grid search object
         grid_search = GridSearchCV(clf, 
                                    param_grid, 
                                    cv=5, 
                                    n_jobs=-1, 
                                    scoring='accuracy')
 
-        # Fit the grid search object to the training data
+        ### Fit the grid search object to the training data
         grid_search.fit(X_train, y_train)
 
-        # Get the best hyperparameters
+        ### Get the best hyperparameters
         best_params = grid_search.best_params_
         print(best_params)
 
     else:
-        # Classifier does not have hyperparameters
+        ### Classifier does not have hyperparameters
         best_params = {}
 
 def ML_function(GCM,reduce_dim,classifier,model_name):
@@ -263,43 +270,41 @@ def ML_function(GCM,reduce_dim,classifier,model_name):
     X_train, X_test, y_train, y_test, feature_names = prep_data(GCM,
                                                                 reduce_dim)
 
-    print(X_train)
-
-    ### Set hyper parameters
+    ### Set hyper parameters based on grid search
     params_by_classifier = {
         'Nearest Neighbor': {
             'PCA': {'n_neighbors': 29, 
-                   'p': 1, 
-                   'weights': 'distance'}, 
-            'None': {'n_neighbors': 25, 
                     'p': 1, 
-                    'weights': 'distance'}
+                    'weights': 'distance'}, 
+            'None': {'n_neighbors': 25, 
+                     'p': 1, 
+                     'weights': 'distance'}
                     },
         'Random Forest': {
             'PCA': {'max_depth': None, 
-                   'min_samples_split': 2, 
-                   'n_estimators': 800, 
-                   'class_weight': 'balanced_subsample', 
-                   'n_jobs':-1},
-            'None': {'max_depth': None, 
                     'min_samples_split': 2, 
                     'n_estimators': 800, 
                     'class_weight': 'balanced_subsample', 
-                    'n_jobs':-1}
-                    },
+                    'n_jobs':-1},
+            'None': {'max_depth': None, 
+                     'min_samples_split': 2, 
+                     'n_estimators': 800, 
+                     'class_weight': 'balanced_subsample', 
+                     'n_jobs':-1}
+                     },
         'Neural Network': {
             'PCA': {'activation': 'tanh',
-                   'alpha': 0.0001, 
-                   'hidden_layer_sizes': (10, 30, 10),
-                   'learning_rate': 'adaptive',
-                   'solver': 'adam'},
-            'None': {'activation': 'tanh',
                     'alpha': 0.0001, 
                     'hidden_layer_sizes': (10, 30, 10),
-                    'learning_rate': 'constant',
+                    'learning_rate': 'adaptive',
                     'solver': 'adam'},
-        }
-    }
+            'None': {'activation': 'tanh',
+                     'alpha': 0.0001, 
+                     'hidden_layer_sizes': (10, 30, 10),
+                     'learning_rate': 'constant',
+                     'solver': 'adam'},
+                     }
+                     }
 
     ### Define classifiers
     classifiers = {
@@ -336,7 +341,8 @@ def ML_function(GCM,reduce_dim,classifier,model_name):
     weighted_accuracy = balanced_accuracy_score(y_test, y_pred)
 
     classes = np.unique(y_test)
-    accuracies = [accuracy_score(y_test[y_test == c], y_pred[y_test == c]) for c in classes]
+    accuracies = [accuracy_score(y_test[y_test == c], 
+                                 y_pred[y_test == c]) for c in classes]
     accuracies.append(accuracy)
     accuracies.append(accuracy)
     accuracies.append(weighted_accuracy)
