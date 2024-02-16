@@ -19,7 +19,7 @@ random.seed(42)
 
 def get_data(fuel_group,GCM,scen,timespan):
     ### Read in features + target
-    df = pd.read_csv('../fuelType_ML/cache/pred.'+GCM+'.'+scen+'_'+timespan+'.csv')
+    df = pd.read_csv('../input/cache/pred.'+GCM+'.'+scen+'_'+timespan+'.csv')
 
     ### Drop Temperate Grassland / Sedgeland (3020) and
     ###      Eaten Out Grass when it's NOT on public land
@@ -95,4 +95,4 @@ def predict_fut(fuel_group,GCM,scen,timespan):
 
 df = predict_fut('Individual',args.GCM,args.scen,args.timespan)
 print('prediction done')
-df.to_csv('fut_'+args.GCM+'_'+args.scen+'_'+args.timespan+'_test_win.csv')
+df.to_csv('fut_'+args.GCM+'_'+args.scen+'_'+args.timespan+'.csv')
