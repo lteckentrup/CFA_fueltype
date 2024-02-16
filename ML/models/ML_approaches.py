@@ -217,7 +217,10 @@ def hypertuning(classifier, GCM, reduce_dim):
     X_train, X_test, y_train, y_test, feature_names = prep_data(GCM,
                                                                 reduce_dim)
 
-    ### Choose parameters for hypertuning
+    ### Choose parameters for hypertuning. You could probably gain a decimal 
+    ### or two adjusting some of those but because that datasets are so big
+    ### computational resources were limiting a bit too
+
     classifiers = {
         'Nearest Neighbor': (KNeighborsClassifier(), 
                              {'n_neighbors': [9,13,17,21,25,29], 
