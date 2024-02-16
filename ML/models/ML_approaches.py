@@ -226,7 +226,7 @@ def hypertuning(classifier, GCM, reduce_dim):
                               }
                              ),
         'Random Forest': (RandomForestClassifier(), 
-                          {'n_estimators': [200, 500, 800], 
+                          {'n_estimators': [200, 300, 500], 
                            'min_samples_split': [2, 5, 10],
                            ### I kept the class weights in because the data are 
                            ### still not *quite* balanced. See above
@@ -281,14 +281,14 @@ def ML_function(GCM,reduce_dim,classifier,model_name):
                      'weights': 'distance'}
                     },
         'Random Forest': {
-            'PCA': {'max_depth': None, 
-                    'min_samples_split': 2, 
-                    'n_estimators': 800, 
+            'PCA': {'max_depth': 20, 
+                    'min_samples_split': 10, 
+                    'n_estimators': 500, 
                     'class_weight': 'balanced_subsample', 
                     'n_jobs':-1},
-            'None': {'max_depth': None, 
-                     'min_samples_split': 2, 
-                     'n_estimators': 800, 
+            'None': {'max_depth': 20, 
+                     'min_samples_split': 10, 
+                     'n_estimators': 500, 
                      'class_weight': 'balanced_subsample', 
                      'n_jobs':-1}
                      },
