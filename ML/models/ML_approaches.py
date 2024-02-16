@@ -217,8 +217,8 @@ def hypertuning(classifier, GCM, reduce_dim):
     X_train, X_test, y_train, y_test, feature_names = prep_data(GCM,
                                                                 reduce_dim)
 
-    ### Choose parameters for hypertuning. You could probably gain a decimal 
-    ### or two adjusting some of those but because that datasets are so big
+    ### Choose parameters for hypertuning. You could probably achieve slightly
+    ### higher scores adjusting some of those but because that datasets are so big
     ### computational resources were limiting a bit too
 
     classifiers = {
